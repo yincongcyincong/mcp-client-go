@@ -54,7 +54,8 @@ func main() {
 		log.Fatalf("Failed to list tools: %v", err)
 	}
 	for _, tool := range tools.Tools {
-		fmt.Printf("- %s: %s\n", tool.Name, tool.Description)
+		a, _ := json.Marshal(tool)
+		fmt.Printf(string(a))
 	}
 	fmt.Println()
 
