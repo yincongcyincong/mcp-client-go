@@ -2,6 +2,7 @@
 
 `mcp-client-go` is a Golang client library for the **Model Context Protocol (MCP)**. It allows developers to register
 and interact with various MCP-based services such as Amap (Gaode Maps) using a unified API.
+[中文文档](https://github.com/yincongcyincong/mcp-client-go/blob/main/README_ZH.md)
 
 ---
 
