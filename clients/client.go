@@ -3,11 +3,12 @@ package clients
 import (
 	"context"
 	"fmt"
+	"sync"
+
 	"github.com/mark3labs/mcp-go/client"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"github.com/yincongcyincong/mcp-client-go/utils"
-	"sync"
 )
 
 var (
