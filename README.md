@@ -66,11 +66,11 @@ go get github.com/yincongcyincong/mcp-client-go
 
 ```go
 conf := clients.InitMCPClient("npx-amap-maps-mcp-server", "npx", []string{
-"AMAP_MAPS_API_KEY=" + AmapApiKey,
-}, []string{
-"-y",
-"@amap/amap-maps-mcp-server",
-}, nil, nil, nil)
+		"AMAP_MAPS_API_KEY=" + AmapApiKey,
+	}, []string{
+		"-y",
+		"@amap/amap-maps-mcp-server",
+	}, mcp.InitializeRequest{}, nil, nil)
 ```
 
 ### Register MCP Clients
