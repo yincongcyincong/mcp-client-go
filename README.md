@@ -53,8 +53,8 @@ go get github.com/yincongcyincong/mcp-client-go
 
 ## 🧪 Example
 
-[client demo]()
-[app demo]()
+[client demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/client)    
+[app demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)
 
 ---
 
