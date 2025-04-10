@@ -56,6 +56,23 @@ func RegisterMCPClient(ctx context.Context, params []*param.MCPClientConf) error
 	return nil
 }
 
+func InitAmapMCPClient(name, command string, env, args []string, initReq mcp.InitializeRequest,
+	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
+	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+
+	amapMCPClient := &param.MCPClientConf{
+		Name:            name,
+		Command:         command,
+		Env:             env,
+		Args:            args,
+		InitReq:         initReq,
+		ToolsBeforeFunc: toolsBeforeFunc,
+		ToolsAfterFunc:  toolsAfterFunc,
+	}
+
+	return amapMCPClient
+}
+
 func GetMCPClient(name string) (*MCPClient, error) {
 	v, ok := mcpClients.Load(name)
 	if !ok {
