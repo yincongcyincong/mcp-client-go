@@ -56,7 +56,7 @@ go get github.com/yincongcyincong/mcp-client-go
 [client demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/client)    
 [app demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)     
 [deepseek demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/deepseek/deepseek.go)       
-[openai demo]()     
+[openai demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/openai/openai.go)     
 
 ---
 
