@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/cohesion-org/deepseek-go"
 	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/sashabaranov/go-openai"
 	"github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
 	"strings"
 )
@@ -22,12 +23,12 @@ func ReturnString(result *mcp.CallToolResult) string {
 	return res.String()
 }
 
-func TransToolsToDPFunctionCall(tools []mcp.Tool) []deepseek.Tool {
-	deepseekTools := make([]deepseek.Tool, 0)
+func TransToolsToChatGPTFunctionCall(tools []mcp.Tool) []openai.Tool {
+	deepseekTools := make([]openai.Tool, 0)
 	for _, tool := range tools {
-		deepseekTool := deepseek.Tool{
+		deepseekTool := openai.Tool{
 			Type: "function",
-			Function: deepseek.Function{
+			Function: &openai.FunctionDefinition{
 				Name:        tool.Name,
 				Description: tool.Description,
 				Parameters: &deepseek.FunctionParameters{

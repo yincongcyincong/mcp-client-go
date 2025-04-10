@@ -18,8 +18,9 @@ func main() {
 	mcpParams := make([]*param.MCPClientConf, 0)
 
 	// todo add modify api key
+	amapApiKey := "xxx"
 	mcpParams = append(mcpParams,
-		amap.InitAmapMCPClient("xxxx", "", nil, nil, nil))
+		amap.InitAmapMCPClient(amapApiKey, "", nil, nil, nil))
 	err := clients.RegisterMCPClient(context.Background(), mcpParams)
 	if err != nil {
 		log.Fatal("init amap fail", err)
@@ -33,7 +34,8 @@ func main() {
 	deepseekTools := utils.TransToolsToDPFunctionCall(mc.Tools)
 
 	// todo modify deepseek token
-	client, err := deepseek.NewClientWithOptions("sk-xxxx")
+	deepseekKey := "sk-xxxx"
+	client, err := deepseek.NewClientWithOptions(deepseekKey)
 	if err != nil {
 		log.Fatal("Error creating deepseek client", "err", err)
 	}

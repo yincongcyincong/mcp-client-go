@@ -54,7 +54,9 @@ go get github.com/yincongcyincong/mcp-client-go
 ## 🧪 Example
 
 [client demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/client)    
-[app demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)
+[app demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)     
+[deepseek demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/deepseek/deepseek.go)       
+[openai demo]()     
 
 ---
 
@@ -81,6 +83,8 @@ clients.RegisterMCPClient(ctx, []*param.MCPClientConf{conf})
 
 ```go
 client, err := clients.GetMCPClient(amap.NpxAmapMapsMcpServer)
+/
+client, err := clients.GetMCPClientByToolName("geo_location")
 ```
 
 ### Execute Tools
