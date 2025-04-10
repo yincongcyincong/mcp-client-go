@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	NpxModelContextProtocolServerGithub = "npx-modelcontextprotocol-server-github"
+	NpxModelContextProtocolGithubServer = "npx-github-mcp-server"
+	DockerGithubServer                  = "docker-github-mcp-server"
 )
 
 func InitModelContextProtocolGithubMCPClient(githubAccessToken string, protocolVersion string, clientInfo *mcp.Implementation,
@@ -14,7 +15,7 @@ func InitModelContextProtocolGithubMCPClient(githubAccessToken string, protocolV
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	amapMCPClient := &param.MCPClientConf{
-		Name:    NpxModelContextProtocolServerGithub,
+		Name:    NpxModelContextProtocolGithubServer,
 		Command: "npx",
 		Env: []string{
 			"GITHUB_PERSONAL_ACCESS_TOKEN=" + githubAccessToken,
@@ -22,6 +23,48 @@ func InitModelContextProtocolGithubMCPClient(githubAccessToken string, protocolV
 		Args: []string{
 			"-y",
 			"@modelcontextprotocol/server-github",
+		},
+		InitReq:         mcp.InitializeRequest{},
+		ToolsBeforeFunc: toolsBeforeFunc,
+		ToolsAfterFunc:  toolsAfterFunc,
+	}
+
+	initRequest := mcp.InitializeRequest{}
+	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
+	if protocolVersion != "" {
+		initRequest.Params.ProtocolVersion = protocolVersion
+	}
+
+	initRequest.Params.ClientInfo = mcp.Implementation{
+		Name:    "modelcontextprotocol/server-github",
+		Version: "0.2.0",
+	}
+	if clientInfo != nil {
+		initRequest.Params.ClientInfo = *clientInfo
+	}
+
+	amapMCPClient.InitReq = initRequest
+
+	return amapMCPClient
+}
+
+func InitDockerGithubMCPClient(githubAccessToken string, protocolVersion string, clientInfo *mcp.Implementation,
+	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
+	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+
+	amapMCPClient := &param.MCPClientConf{
+		Name:    DockerGithubServer,
+		Command: "docker",
+		Env: []string{
+			"GITHUB_PERSONAL_ACCESS_TOKEN=" + githubAccessToken,
+		},
+		Args: []string{
+			"run",
+			"-i",
+			"--rm",
+			"-e",
+			"GITHUB_PERSONAL_ACCESS_TOKEN",
+			"ghcr.io/github/github-mcp-server",
 		},
 		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,

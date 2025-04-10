@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	NpxAmapMapsMcpServer = "npx-amap-amap-maps-mcp-server"
+	NpxAmapMapsMcpServer = "npx-amap-maps-mcp-server"
 )
 
 func InitAmapMCPClient(AmapApiKey string, protocolVersion string, clientInfo *mcp.Implementation,
