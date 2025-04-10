@@ -5,12 +5,16 @@ import (
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 )
 
-func InitGithubMCPClient(githubAccessToken string,
+const (
+	NpxModelContextProtocolServerGithub = "npx-modelcontextprotocol-server-github"
+)
+
+func InitModelContextProtocolGithubMCPClient(githubAccessToken string, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	amapMCPClient := &param.MCPClientConf{
-		Name:    "npx-amap",
+		Name:    NpxModelContextProtocolServerGithub,
 		Command: "npx",
 		Env: []string{
 			"GITHUB_PERSONAL_ACCESS_TOKEN=" + githubAccessToken,
@@ -23,13 +27,21 @@ func InitGithubMCPClient(githubAccessToken string,
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
-	
+
 	initRequest := mcp.InitializeRequest{}
 	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
+	if protocolVersion != "" {
+		initRequest.Params.ProtocolVersion = protocolVersion
+	}
+
 	initRequest.Params.ClientInfo = mcp.Implementation{
 		Name:    "modelcontextprotocol/server-github",
 		Version: "0.2.0",
 	}
+	if clientInfo != nil {
+		initRequest.Params.ClientInfo = *clientInfo
+	}
+
 	amapMCPClient.InitReq = initRequest
 
 	return amapMCPClient

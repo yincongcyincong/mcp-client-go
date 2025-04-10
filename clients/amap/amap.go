@@ -5,12 +5,16 @@ import (
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 )
 
-func InitAmapMCPClient(AmapApiKey string,
+const (
+	NpxAmapMapsMcpServer = "npx-amap-amap-maps-mcp-server"
+)
+
+func InitAmapMCPClient(AmapApiKey string, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	amapMCPClient := &param.MCPClientConf{
-		Name:    "npx-amap",
+		Name:    NpxAmapMapsMcpServer,
 		Command: "npx",
 		Env: []string{
 			"AMAP_MAPS_API_KEY=" + AmapApiKey,
@@ -26,9 +30,15 @@ func InitAmapMCPClient(AmapApiKey string,
 
 	initRequest := mcp.InitializeRequest{}
 	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
+	if protocolVersion != "" {
+		initRequest.Params.ProtocolVersion = protocolVersion
+	}
 	initRequest.Params.ClientInfo = mcp.Implementation{
 		Name:    "mcp-server/amap-maps",
 		Version: "0.1.0",
+	}
+	if clientInfo != nil {
+		initRequest.Params.ClientInfo = *clientInfo
 	}
 	amapMCPClient.InitReq = initRequest
 
