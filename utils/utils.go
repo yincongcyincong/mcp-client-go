@@ -23,6 +23,27 @@ func ReturnString(result *mcp.CallToolResult) string {
 	return res.String()
 }
 
+func TransToolsToDPFunctionCall(tools []mcp.Tool) []deepseek.Tool {
+	deepseekTools := make([]deepseek.Tool, 0)
+	for _, tool := range tools {
+		deepseekTool := deepseek.Tool{
+			Type: "function",
+			Function: deepseek.Function{
+				Name:        tool.Name,
+				Description: tool.Description,
+				Parameters: &deepseek.FunctionParameters{
+					Type:       "object",
+					Properties: tool.InputSchema.Properties,
+					Required:   tool.InputSchema.Required,
+				},
+			},
+		}
+		deepseekTools = append(deepseekTools, deepseekTool)
+	}
+
+	return deepseekTools
+}
+
 func TransToolsToChatGPTFunctionCall(tools []mcp.Tool) []openai.Tool {
 	deepseekTools := make([]openai.Tool, 0)
 	for _, tool := range tools {

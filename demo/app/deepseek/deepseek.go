@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"github.com/cohesion-org/deepseek-go"
 	"github.com/cohesion-org/deepseek-go/constants"
@@ -10,7 +10,6 @@ import (
 	"github.com/yincongcyincong/mcp-client-go/clients/amap"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"github.com/yincongcyincong/mcp-client-go/utils"
-	"io"
 	"log"
 )
 
@@ -18,7 +17,7 @@ func main() {
 	mcpParams := make([]*param.MCPClientConf, 0)
 
 	// todo add modify api key
-	amapApiKey := "xxx"
+	amapApiKey := "xxxx"
 	mcpParams = append(mcpParams,
 		amap.InitAmapMCPClient(amapApiKey, "", nil, nil, nil))
 	err := clients.RegisterMCPClient(context.Background(), mcpParams)
@@ -40,19 +39,15 @@ func main() {
 		log.Fatal("Error creating deepseek client", "err", err)
 	}
 
-	request := &deepseek.StreamChatCompletionRequest{
-		Model:  deepseek.DeepSeekChat,
-		Stream: true,
-		StreamOptions: deepseek.StreamOptions{
-			IncludeUsage: true,
-		},
+	request := &deepseek.ChatCompletionRequest{
+		Model: deepseek.DeepSeekChat,
 		Tools: deepseekTools,
 	}
 
 	messages := []deepseek.ChatCompletionMessage{
 		{
 			Role:    constants.ChatMessageRoleUser,
-			Content: "My IP address is 111.108.111.135. May I know which city I am in",
+			Content: "My IP address is 220.181.3.151. May I know which city I am in",
 		},
 	}
 
@@ -60,31 +55,53 @@ func main() {
 
 	ctx := context.Background()
 
-	stream, err := client.CreateChatCompletionStream(ctx, request)
+	response, err := client.CreateChatCompletion(ctx, request)
 	if err != nil {
 		log.Fatal("ChatCompletionStream error", "err", err)
 	}
-	defer stream.Close()
 
-	for {
-		response, err := stream.Recv()
-		if errors.Is(err, io.EOF) {
-			log.Println("Stream finished")
-			break
-		}
-		if err != nil {
-			log.Fatal("Stream error", "err", err)
-			break
-		}
-		for _, choice := range response.Choices {
-			if len(choice.Delta.ToolCalls) > 0 {
-				fmt.Println("tools", choice.Delta.ToolCalls)
-				continue
-			}
+	// will be empty
+	fmt.Println("response:", response.Choices[0].Message.Content)
 
-			// exceed max telegram one message length
-			fmt.Println(choice.Delta.Content)
-		}
+	// one tool call request
+	fmt.Println("tool calls:", response.Choices[0].Message.ToolCalls)
 
+	msg := response.Choices[0].Message
+	toolCalls := msg.ToolCalls
+
+	p := make(map[string]interface{})
+	err = json.Unmarshal([]byte(msg.ToolCalls[0].Function.Arguments), &p)
+	if err != nil {
+		log.Fatal("unmarshal fail", "err", err)
 	}
+	toolRes, err := mc.ExecTools(ctx, msg.ToolCalls[0].Function.Name, p)
+	if err != nil {
+		log.Fatal("exec fail", "err", err)
+	}
+	fmt.Println("toolRes:", toolRes)
+
+	question := deepseek.ChatCompletionMessage{
+		Role:      deepseek.ChatMessageRoleAssistant,
+		Content:   msg.Content,
+		ToolCalls: toolCalls,
+	}
+	answer := deepseek.ChatCompletionMessage{
+		Role:       deepseek.ChatMessageRoleTool,
+		Content:    toolRes,
+		ToolCallID: toolCalls[0].ID,
+	}
+
+	messages = append(messages, question, answer)
+	toolReq := &deepseek.ChatCompletionRequest{
+		Model:    request.Model,
+		Messages: messages,
+	}
+
+	response, err = client.CreateChatCompletion(ctx, toolReq)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+
+	// will return the current time
+	fmt.Println("response:", response.Choices[0].Message.Content)
 }

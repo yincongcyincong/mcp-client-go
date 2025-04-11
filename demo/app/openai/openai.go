@@ -16,7 +16,7 @@ func main() {
 	mcpParams := make([]*param.MCPClientConf, 0)
 
 	// todo add modify api key
-	amapApiKey := "xxx"
+	amapApiKey := "29572e42530ac949d37a7d00e5d51f4a"
 	mcpParams = append(mcpParams,
 		amap.InitAmapMCPClient(amapApiKey, "", nil, nil, nil))
 	err := clients.RegisterMCPClient(context.Background(), mcpParams)
@@ -33,21 +33,30 @@ func main() {
 
 	// todo modify deepseek token
 	openAIkey := "xxx"
-	client := openai.NewClient(openAIkey)
+
+	//proxy, err := url.Parse("http://127.0.0.1:7890")
+	//if err != nil {
+	//	log.Fatal("parse deepseek proxy error", "err", err)
+	//}
+
+	config := openai.DefaultConfig(openAIkey)
+	//config.HTTPClient = &http.Client{
+	//	Transport: &http.Transport{
+	//		Proxy: http.ProxyURL(proxy),
+	//	},
+	//}
+	//config.BaseURL = "https://api.chatanywhere.org"
+	client := openai.NewClientWithConfig(config)
 
 	ctx := context.Background()
 
-	// 用户输入
 	userMessage := openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
-		Content: "What's the weather like in Tokyo today?",
+		Content: "My IP address is 220.181.3.151. May I know which city I am in",
 	}
 
-	// 定义函数 schema
-
-	// 第一次请求：ChatGPT 判断是否调用函数
 	resp, err := client.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
-		Model:    openai.GPT4,
+		Model:    openai.GPT3Dot5Turbo0125,
 		Messages: []openai.ChatCompletionMessage{userMessage},
 		Tools:    openaiTools,
 	})
@@ -57,29 +66,38 @@ func main() {
 
 	msg := resp.Choices[0].Message
 
+	msgStr, _ := json.Marshal(msg)
+
+	fmt.Println(string(msgStr))
 	// 如果需要调用函数
-	if msg.FunctionCall != nil {
+	if len(msg.ToolCalls) > 0 {
 		args := make(map[string]interface{})
-		if err := json.Unmarshal([]byte(msg.FunctionCall.Arguments), &args); err != nil {
+		if err := json.Unmarshal([]byte(msg.ToolCalls[0].Function.Arguments), &args); err != nil {
 			log.Fatalf("Failed to parse function args: %v\n", err)
 		}
 
 		// 假设我们调用本地函数 getWeather
-		result, err := mc.ExecTools(ctx, msg.FunctionCall.Name, args)
+		result, err := mc.ExecTools(ctx, msg.ToolCalls[0].Function.Name, args)
 		if err != nil {
 			log.Fatalf("Exec fail: %v\n", err)
 		}
 
+		fmt.Println("call tools res:", result)
+
 		// 把函数调用的结果喂回去
 		resp2, err := client.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
-			Model: openai.GPT4,
+			Model: openai.GPT3Dot5Turbo0125,
 			Messages: []openai.ChatCompletionMessage{
 				userMessage,
-				msg,
 				{
-					Role:    openai.ChatMessageRoleFunction,
-					Name:    msg.FunctionCall.Name,
-					Content: result,
+					Role:      openai.ChatMessageRoleAssistant,
+					Content:   msg.Content,
+					ToolCalls: msg.ToolCalls,
+				},
+				{
+					Role:       openai.ChatMessageRoleTool,
+					Content:    result,
+					ToolCallID: msg.ToolCalls[0].ID,
 				},
 			},
 		})
