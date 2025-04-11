@@ -93,18 +93,6 @@ client, err := clients.GetMCPClientByToolName("geo_location")
 client.ExecTools(ctx, "tool_name", map[string]interface{}{...})
 ```
 
-#### Common Tool Names (Amap)
-
-- `"maps_regeocode"` – Get detailed address from coordinates
-- `"maps_ip_location"` – Get location info based on IP address
-
----
-
-## 🔐 Authentication
-
-An **access token** is required to authenticate MCP clients. Please contact your service administrator to obtain a valid
-token.
-
 ---
 
 ## 📄 License
