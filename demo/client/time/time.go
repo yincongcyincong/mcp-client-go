@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-	// execute `npx @playwright/mcp@latest --port 8931` first
 	mc := mcpTime.InitTimeMCPClient("", "", nil, nil, nil)
 
 	// Create context with timeout
@@ -35,7 +34,7 @@ func main() {
 	}
 
 	data, err := c.ExecTools(ctx, "get_current_time", map[string]interface{}{
-		"timezone": "Asia/Shanghai",
+		"timezone": "America/New_York",
 	})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)

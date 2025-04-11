@@ -14,6 +14,10 @@ func InitTimeMCPClient(localTimezone string, protocolVersion string, clientInfo 
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
+	if localTimezone == "" {
+		localTimezone = "Asia/Shanghai"
+	}
+
 	timeMCPClient := &param.MCPClientConf{
 		Name: UvTimeMcpServer,
 		StdioClientConf: &param.StdioClientConfig{
