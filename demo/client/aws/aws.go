@@ -12,7 +12,11 @@ import (
 )
 
 func main() {
-	mc := aws.InitAwsMCPClient("xxx", "xxx", "xxx", "", nil, nil, nil)
+	mc := aws.InitAwsMCPClient(&aws.AwsParams{
+		AwsAccessKey: "xxx",
+		AwsSecretKey: "xxxx",
+		AwsRegion:    "us-east-1",
+	}, "", nil, nil, nil)
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

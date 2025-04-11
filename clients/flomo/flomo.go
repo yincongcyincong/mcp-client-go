@@ -9,7 +9,11 @@ const (
 	NpxFlomoMcpServer = "npx-flomo-mcp-server"
 )
 
-func InitFlomoMCPClient(filecrawlApiUrl, protocolVersion string, clientInfo *mcp.Implementation,
+type FlomoParam struct {
+	FilecrawlApiUrl string
+}
+
+func InitFlomoMCPClient(p *FlomoParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -18,7 +22,7 @@ func InitFlomoMCPClient(filecrawlApiUrl, protocolVersion string, clientInfo *mcp
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"FLOMO_API_URL=" + filecrawlApiUrl,
+				"FLOMO_API_URL=" + p.FilecrawlApiUrl,
 			},
 			Args: []string{
 				"-y",

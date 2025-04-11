@@ -1,23 +1,24 @@
-package main
+package firecrawl
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/yincongcyincong/mcp-client-go/clients"
-	"github.com/yincongcyincong/mcp-client-go/clients/googlemap"
+	"github.com/yincongcyincong/mcp-client-go/clients/firecrawl"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"log"
 	"time"
 )
 
 func main() {
-	mc := googlemap.InitGooglemapMCPClient(&googlemap.GoogleMapParam{
-		GooglemapApiKey: "xxx",
+	// todo modify token
+	mc := firecrawl.InitFirecrawlMCPClient(&firecrawl.FireCrawlParam{
+		FilecrawlApiKey: "xxx",
 	}, "", nil, nil, nil)
 
 	// Create context with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
 
 	errs := clients.RegisterMCPClient(ctx, []*param.MCPClientConf{mc})
@@ -25,7 +26,7 @@ func main() {
 		log.Fatal("InitMCPClient failed:", errs)
 	}
 
-	c, err := clients.GetMCPClient(googlemap.NpxGooglemapMcpServer)
+	c, err := clients.GetMCPClient(firecrawl.NpxFirecrawlMcpServer)
 	if err != nil {
 		log.Fatal("GetMCPClient failed:", err)
 	}
@@ -35,9 +36,7 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "maps_geocode", map[string]interface{}{
-		"address": "Los Angeles",
-	})
+	data, err := c.ExecTools(ctx, "list_commits", map[string]interface{}{})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)
 	}

@@ -9,7 +9,11 @@ const (
 	NpxFigmaMcpServer = "npx-figma-mcp-server"
 )
 
-func InitFigmaMCPClient(figmaApiKey, protocolVersion string, clientInfo *mcp.Implementation,
+type FramelinkFigmaParam struct {
+	FigmaApiKey string
+}
+
+func InitFigmaMCPClient(p *FramelinkFigmaParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -21,7 +25,7 @@ func InitFigmaMCPClient(figmaApiKey, protocolVersion string, clientInfo *mcp.Imp
 			Args: []string{
 				"-y",
 				"figma-developer-mcp",
-				"--figma-api-key=" + figmaApiKey,
+				"--figma-api-key=" + p.FigmaApiKey,
 				"--stdio",
 			},
 			InitReq: mcp.InitializeRequest{},

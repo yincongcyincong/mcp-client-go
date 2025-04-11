@@ -9,7 +9,11 @@ const (
 	NpxBaidumapMcpServer = "npx-baidumap-mcp-server"
 )
 
-func InitBaidumapMCPClient(BaidumapApiKey string, protocolVersion string, clientInfo *mcp.Implementation,
+type BaidumapParam struct {
+	BaidumapApiKey string
+}
+
+func InitBaidumapMCPClient(p *BaidumapParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -18,7 +22,7 @@ func InitBaidumapMCPClient(BaidumapApiKey string, protocolVersion string, client
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"BAIDU_MAP_API_KEY=" + BaidumapApiKey,
+				"BAIDU_MAP_API_KEY=" + p.BaidumapApiKey,
 			},
 			Args: []string{
 				"-y",

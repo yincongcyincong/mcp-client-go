@@ -1,23 +1,25 @@
-package main
+package slack
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/yincongcyincong/mcp-client-go/clients"
-	"github.com/yincongcyincong/mcp-client-go/clients/googlemap"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
+	"github.com/yincongcyincong/mcp-client-go/clients/slack"
 	"log"
 	"time"
 )
 
 func main() {
-	mc := googlemap.InitGooglemapMCPClient(&googlemap.GoogleMapParam{
-		GooglemapApiKey: "xxx",
+	// todo modify token
+	mc := slack.InitSlackMCPClient(&slack.SlackParam{
+		SlackBotToken: "xxx",
+		SlackTeamID:   "xxx",
 	}, "", nil, nil, nil)
 
 	// Create context with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
 
 	errs := clients.RegisterMCPClient(ctx, []*param.MCPClientConf{mc})
@@ -25,7 +27,7 @@ func main() {
 		log.Fatal("InitMCPClient failed:", errs)
 	}
 
-	c, err := clients.GetMCPClient(googlemap.NpxGooglemapMcpServer)
+	c, err := clients.GetMCPClient(slack.NpxSlackMcpServer)
 	if err != nil {
 		log.Fatal("GetMCPClient failed:", err)
 	}
@@ -35,9 +37,7 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "maps_geocode", map[string]interface{}{
-		"address": "Los Angeles",
-	})
+	data, err := c.ExecTools(ctx, "list_commits", map[string]interface{}{})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)
 	}

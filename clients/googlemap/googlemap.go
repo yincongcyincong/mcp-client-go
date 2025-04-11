@@ -10,7 +10,11 @@ const (
 	DockerGooglemapMcpServer = "docker-googlemap-mcp-server"
 )
 
-func InitGooglemapMCPClient(googlemapApiKey, protocolVersion string, clientInfo *mcp.Implementation,
+type GoogleMapParam struct {
+	GooglemapApiKey string
+}
+
+func InitGooglemapMCPClient(p *GoogleMapParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -19,7 +23,7 @@ func InitGooglemapMCPClient(googlemapApiKey, protocolVersion string, clientInfo 
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"GOOGLE_MAPS_API_KEY=" + googlemapApiKey,
+				"GOOGLE_MAPS_API_KEY=" + p.GooglemapApiKey,
 			},
 			Args: []string{
 				"-y",
@@ -48,7 +52,7 @@ func InitGooglemapMCPClient(googlemapApiKey, protocolVersion string, clientInfo 
 	return googlemapMCPClient
 }
 
-func InitDockerGooglemapMCPClient(googlemapApiKey, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerGooglemapMCPClient(p *GoogleMapParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -57,7 +61,7 @@ func InitDockerGooglemapMCPClient(googlemapApiKey, protocolVersion string, clien
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "docker",
 			Env: []string{
-				"GOOGLE_MAPS_API_KEY=" + googlemapApiKey,
+				"GOOGLE_MAPS_API_KEY=" + p.GooglemapApiKey,
 			},
 			Args: []string{
 				"run",

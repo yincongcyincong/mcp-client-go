@@ -9,7 +9,11 @@ const (
 	NpxTavilyMcpServer = "npx-tavily-mcp-server"
 )
 
-func InitTavilyMCPClient(tavilyApiKey string, protocolVersion string, clientInfo *mcp.Implementation,
+type TavilyParam struct {
+	TavilyApiKey string
+}
+
+func InitTavilyMCPClient(p *TavilyParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -17,7 +21,7 @@ func InitTavilyMCPClient(tavilyApiKey string, protocolVersion string, clientInfo
 		Name: NpxTavilyMcpServer,
 		StdioClientConf: &param.StdioClientConfig{Command: "npx",
 			Env: []string{
-				"TAVILY_API_KEY=" + tavilyApiKey,
+				"TAVILY_API_KEY=" + p.TavilyApiKey,
 			},
 			Args: []string{
 				"-y",

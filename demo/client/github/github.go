@@ -13,7 +13,9 @@ import (
 
 func main() {
 	// todo modify token
-	mc := github.InitModelContextProtocolGithubMCPClient("xxxx", "", nil, nil, nil)
+	mc := github.InitModelContextProtocolGithubMCPClient(&github.GithubParam{
+		GithubAccessToken: "xxx",
+	}, "", nil, nil, nil)
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
@@ -24,7 +26,7 @@ func main() {
 		log.Fatal("InitMCPClient failed:", errs)
 	}
 
-	c, err := clients.GetMCPClient(github.NpxModelContextProtocolServerGithub)
+	c, err := clients.GetMCPClient(github.NpxModelContextProtocolGithubServer)
 	if err != nil {
 		log.Fatal("GetMCPClient failed:", err)
 	}

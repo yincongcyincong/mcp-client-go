@@ -10,7 +10,11 @@ const (
 	DockerPostgresqlMcpServer = "docker-postgresql-mcp-server"
 )
 
-func InitPostgresqlMCPClient(postgresqlLink, protocolVersion string, clientInfo *mcp.Implementation,
+type PostgreSQLParam struct {
+	PostgresqlLink string
+}
+
+func InitPostgresqlMCPClient(p *PostgreSQLParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -22,7 +26,7 @@ func InitPostgresqlMCPClient(postgresqlLink, protocolVersion string, clientInfo 
 			Args: []string{
 				"-y",
 				"@modelcontextprotocol/server-postgres",
-				postgresqlLink,
+				p.PostgresqlLink,
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
@@ -47,7 +51,7 @@ func InitPostgresqlMCPClient(postgresqlLink, protocolVersion string, clientInfo 
 	return postgresqlMCPClient
 }
 
-func InitDockerPostgresqlMCPClient(postgresqlLink, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerPostgresqlMCPClient(p *PostgreSQLParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -61,7 +65,7 @@ func InitDockerPostgresqlMCPClient(postgresqlLink, protocolVersion string, clien
 				"-i",
 				"--rm",
 				"mcp/postgres",
-				postgresqlLink,
+				p.PostgresqlLink,
 			},
 			InitReq: mcp.InitializeRequest{},
 		},

@@ -12,7 +12,9 @@ import (
 )
 
 func main() {
-	mc := filesystem.InitFilesystemMCPClient([]string{"/Users/yincong/"}, "", nil, nil, nil)
+	mc := filesystem.InitFilesystemMCPClient(&filesystem.FilesystemParam{
+		Paths: []string{"/Users/yincong/"},
+	}, "", nil, nil, nil)
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

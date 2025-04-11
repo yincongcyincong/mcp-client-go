@@ -11,7 +11,12 @@ const (
 	DockerFilesystemServer = "docker-filesystem-mcp-server"
 )
 
-func InitFilesystemMCPClient(paths []string, protocolVersion string, clientInfo *mcp.Implementation,
+type FilesystemParam struct {
+	Paths     []string
+	PathPairs map[string]string
+}
+
+func InitFilesystemMCPClient(p *FilesystemParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -30,7 +35,7 @@ func InitFilesystemMCPClient(paths []string, protocolVersion string, clientInfo 
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	filesystemMCPClient.StdioClientConf.Args = append(filesystemMCPClient.StdioClientConf.Args, paths...)
+	filesystemMCPClient.StdioClientConf.Args = append(filesystemMCPClient.StdioClientConf.Args, p.Paths...)
 
 	initRequest := mcp.InitializeRequest{}
 	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
@@ -49,7 +54,7 @@ func InitFilesystemMCPClient(paths []string, protocolVersion string, clientInfo 
 	return filesystemMCPClient
 }
 
-func InitDockerFilesystemMCPClient(pathPair map[string]string, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerFilesystemMCPClient(p *FilesystemParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -70,7 +75,7 @@ func InitDockerFilesystemMCPClient(pathPair map[string]string, protocolVersion s
 		"-i",
 		"--rm",
 	}
-	for srcPath, dstPath := range pathPair {
+	for srcPath, dstPath := range p.PathPairs {
 		args = append(args, "--mount", fmt.Sprintf("type=bind,src=%s,dst=%s", srcPath, dstPath))
 
 	}

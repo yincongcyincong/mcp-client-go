@@ -10,7 +10,11 @@ const (
 	DockerGithubServer                  = "docker-github-mcp-server"
 )
 
-func InitModelContextProtocolGithubMCPClient(githubAccessToken string, protocolVersion string, clientInfo *mcp.Implementation,
+type GithubParam struct {
+	GithubAccessToken string
+}
+
+func InitModelContextProtocolGithubMCPClient(p *GithubParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -19,7 +23,7 @@ func InitModelContextProtocolGithubMCPClient(githubAccessToken string, protocolV
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"GITHUB_PERSONAL_ACCESS_TOKEN=" + githubAccessToken,
+				"GITHUB_PERSONAL_ACCESS_TOKEN=" + p.GithubAccessToken,
 			},
 			Args: []string{
 				"-y",
@@ -50,7 +54,7 @@ func InitModelContextProtocolGithubMCPClient(githubAccessToken string, protocolV
 	return amapMCPClient
 }
 
-func InitDockerGithubMCPClient(githubAccessToken string, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerGithubMCPClient(p *GithubParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -59,7 +63,7 @@ func InitDockerGithubMCPClient(githubAccessToken string, protocolVersion string,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "docker",
 			Env: []string{
-				"GITHUB_PERSONAL_ACCESS_TOKEN=" + githubAccessToken,
+				"GITHUB_PERSONAL_ACCESS_TOKEN=" + p.GithubAccessToken,
 			},
 			Args: []string{
 				"run",

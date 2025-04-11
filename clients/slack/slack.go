@@ -10,7 +10,12 @@ const (
 	DockerSlackMcpServer = "docker-slack-mcp-server"
 )
 
-func InitSlackMCPClient(slackBotToken, slackTeamID, protocolVersion string, clientInfo *mcp.Implementation,
+type SlackParam struct {
+	SlackBotToken string
+	SlackTeamID   string
+}
+
+func InitSlackMCPClient(p *SlackParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -19,8 +24,8 @@ func InitSlackMCPClient(slackBotToken, slackTeamID, protocolVersion string, clie
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"SLACK_BOT_TOKEN=" + slackBotToken,
-				"SLACK_TEAM_ID=" + slackTeamID,
+				"SLACK_BOT_TOKEN=" + p.SlackBotToken,
+				"SLACK_TEAM_ID=" + p.SlackTeamID,
 			},
 			Args: []string{
 				"-y",
@@ -49,7 +54,7 @@ func InitSlackMCPClient(slackBotToken, slackTeamID, protocolVersion string, clie
 	return slackMCPClient
 }
 
-func InitDockerSlackMCPClient(slackBotToken, slackTeamID, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerSlackMCPClient(p *SlackParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -58,8 +63,8 @@ func InitDockerSlackMCPClient(slackBotToken, slackTeamID, protocolVersion string
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "docker",
 			Env: []string{
-				"SLACK_BOT_TOKEN=" + slackBotToken,
-				"SLACK_TEAM_ID=" + slackTeamID,
+				"SLACK_BOT_TOKEN=" + p.SlackBotToken,
+				"SLACK_TEAM_ID=" + p.SlackTeamID,
 			},
 			Args: []string{
 				"run",

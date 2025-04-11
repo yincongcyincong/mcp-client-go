@@ -9,7 +9,11 @@ const (
 	NpxAgentQLMcpServer = "npx-agent-ql-mcp-server"
 )
 
-func InitAmapMCPClient(AgentQLApiKey string, protocolVersion string, clientInfo *mcp.Implementation,
+type AgentQLParam struct {
+	AgentQLApiKey string
+}
+
+func InitAgentQLMCPClient(p *AgentQLParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -18,7 +22,7 @@ func InitAmapMCPClient(AgentQLApiKey string, protocolVersion string, clientInfo 
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"AGENTQL_API_KEY=" + AgentQLApiKey,
+				"AGENTQL_API_KEY=" + p.AgentQLApiKey,
 			},
 			Args: []string{
 				"-y",

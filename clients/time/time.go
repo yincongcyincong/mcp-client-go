@@ -10,12 +10,16 @@ const (
 	DockerTimeMcpServer = "docker-time-mcp-server"
 )
 
-func InitTimeMCPClient(localTimezone string, protocolVersion string, clientInfo *mcp.Implementation,
+type TimeParma struct {
+	LocalTimezone string
+}
+
+func InitTimeMCPClient(p *TimeParma, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
-	if localTimezone == "" {
-		localTimezone = "Asia/Shanghai"
+	if p.LocalTimezone == "" {
+		p.LocalTimezone = "Asia/Shanghai"
 	}
 
 	timeMCPClient := &param.MCPClientConf{
@@ -25,7 +29,7 @@ func InitTimeMCPClient(localTimezone string, protocolVersion string, clientInfo 
 			Env:     []string{},
 			Args: []string{
 				"mcp-server-time",
-				"--local-timezone=" + localTimezone,
+				"--local-timezone=" + p.LocalTimezone,
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
@@ -50,9 +54,13 @@ func InitTimeMCPClient(localTimezone string, protocolVersion string, clientInfo 
 	return timeMCPClient
 }
 
-func InitDockerTimeMCPClient(localTimezone string, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerTimeMCPClient(p *TimeParma, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+
+	if p.LocalTimezone == "" {
+		p.LocalTimezone = "Asia/Shanghai"
+	}
 
 	timeMCPClient := &param.MCPClientConf{
 		Name: DockerTimeMcpServer,
@@ -60,8 +68,10 @@ func InitDockerTimeMCPClient(localTimezone string, protocolVersion string, clien
 			Command: "uvx",
 			Env:     []string{},
 			Args: []string{
-				"mcp-server-time",
-				"--local-timezone=" + localTimezone,
+				"run",
+				"-i",
+				"--rm",
+				"mcp/time",
 			},
 			InitReq: mcp.InitializeRequest{},
 		},

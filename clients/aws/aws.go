@@ -10,7 +10,13 @@ const (
 	DockerAwsMcpServer = "docker-aws-mcp-server"
 )
 
-func InitAwsMCPClient(awsAccessKey, awsSecretKey, awsRegion string, protocolVersion string, clientInfo *mcp.Implementation,
+type AwsParams struct {
+	AwsAccessKey string
+	AwsSecretKey string
+	AwsRegion    string
+}
+
+func InitAwsMCPClient(p *AwsParams, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -19,9 +25,9 @@ func InitAwsMCPClient(awsAccessKey, awsSecretKey, awsRegion string, protocolVers
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"AWS_ACCESS_KEY_ID=" + awsAccessKey,
-				"AWS_SECRET_ACCESS_KEY=" + awsSecretKey,
-				"AWS_REGION=" + awsRegion,
+				"AWS_ACCESS_KEY_ID=" + p.AwsAccessKey,
+				"AWS_SECRET_ACCESS_KEY=" + p.AwsSecretKey,
+				"AWS_REGION=" + p.AwsRegion,
 			},
 			Args: []string{
 				"-y",
@@ -50,7 +56,7 @@ func InitAwsMCPClient(awsAccessKey, awsSecretKey, awsRegion string, protocolVers
 	return awsMCPClient
 }
 
-func InitDockerAwsMCPClient(awsAccessKey, awsSecretKey, awsRegion string, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerAwsMCPClient(p *AwsParams, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -59,9 +65,9 @@ func InitDockerAwsMCPClient(awsAccessKey, awsSecretKey, awsRegion string, protoc
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"AWS_ACCESS_KEY_ID=" + awsAccessKey,
-				"AWS_SECRET_ACCESS_KEY=" + awsSecretKey,
-				"AWS_REGION=" + awsRegion,
+				"AWS_ACCESS_KEY_ID=" + p.AwsAccessKey,
+				"AWS_SECRET_ACCESS_KEY=" + p.AwsSecretKey,
+				"AWS_REGION=" + p.AwsRegion,
 			},
 			Args: []string{
 				"run",

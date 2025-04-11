@@ -10,7 +10,11 @@ const (
 	DockerSentryMcpServer = "docker-sentry-mcp-server"
 )
 
-func InitSentryMCPClient(sentryToken, protocolVersion string, clientInfo *mcp.Implementation,
+type SentryParam struct {
+	SentryToken string
+}
+
+func InitSentryMCPClient(p *SentryParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -22,7 +26,7 @@ func InitSentryMCPClient(sentryToken, protocolVersion string, clientInfo *mcp.Im
 			Args: []string{
 				"mcp-server-sentry",
 				"--auth-token",
-				sentryToken,
+				p.SentryToken,
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
@@ -47,7 +51,7 @@ func InitSentryMCPClient(sentryToken, protocolVersion string, clientInfo *mcp.Im
 	return sentryMCPClient
 }
 
-func InitDockerSentryMCPClient(sentryToken, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerSentryMCPClient(p *SentryParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -62,7 +66,7 @@ func InitDockerSentryMCPClient(sentryToken, protocolVersion string, clientInfo *
 				"--rm",
 				"mcp/sentry",
 				"--auth-token",
-				sentryToken,
+				p.SentryToken,
 			},
 			InitReq: mcp.InitializeRequest{},
 		},

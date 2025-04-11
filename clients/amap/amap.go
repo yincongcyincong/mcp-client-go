@@ -9,7 +9,11 @@ const (
 	NpxAmapMapsMcpServer = "npx-amap-maps-mcp-server"
 )
 
-func InitAmapMCPClient(AmapApiKey string, protocolVersion string, clientInfo *mcp.Implementation,
+type AmapParam struct {
+	AmapApiKey string
+}
+
+func InitAmapMCPClient(p *AmapParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -18,7 +22,7 @@ func InitAmapMCPClient(AmapApiKey string, protocolVersion string, clientInfo *mc
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"AMAP_MAPS_API_KEY=" + AmapApiKey,
+				"AMAP_MAPS_API_KEY=" + p.AmapApiKey,
 			},
 			Args: []string{
 				"-y",

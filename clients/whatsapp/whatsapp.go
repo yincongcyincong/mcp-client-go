@@ -9,7 +9,12 @@ const (
 	UvWhatsAppMcpServer = "nv-whatsapp-mcp-server"
 )
 
-func InitWhatsappMCPClient(whatsappPath, pythonMainFile string, protocolVersion string, clientInfo *mcp.Implementation,
+type WhaPsAppParam struct {
+	WhatsappPath   string
+	PythonMainFile string
+}
+
+func InitWhatsappMCPClient(p *WhaPsAppParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -20,9 +25,9 @@ func InitWhatsappMCPClient(whatsappPath, pythonMainFile string, protocolVersion 
 			Env:     []string{},
 			Args: []string{
 				"--directory",
-				whatsappPath, // cd into the repo, run `pwd` and enter the output here + "/whatsapp-mcp-server"
+				p.WhatsappPath, // cd into the repo, run `pwd` and enter the output here + "/whatsapp-mcp-server"
 				"run",
-				pythonMainFile,
+				p.PythonMainFile,
 			},
 			InitReq: mcp.InitializeRequest{},
 		},

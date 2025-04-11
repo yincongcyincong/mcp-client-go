@@ -19,7 +19,9 @@ func main() {
 	// todo add modify api key
 	amapApiKey := "xxxx"
 	mcpParams = append(mcpParams,
-		amap.InitAmapMCPClient(amapApiKey, "", nil, nil, nil))
+		amap.InitAmapMCPClient(&amap.AmapParam{
+			AmapApiKey: amapApiKey,
+		}, "", nil, nil, nil))
 	errs := clients.RegisterMCPClient(context.Background(), mcpParams)
 	if len(errs) > 0 {
 		log.Fatal("init amap fail", errs)

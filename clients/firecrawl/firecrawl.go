@@ -9,7 +9,11 @@ const (
 	NpxFirecrawlMcpServer = "npx-firecrawl-mcp-server"
 )
 
-func InitFirecrawlMCPClient(filecrawlApiKey, protocolVersion string, clientInfo *mcp.Implementation,
+type FireCrawlParam struct {
+	FilecrawlApiKey string
+}
+
+func InitFirecrawlMCPClient(p *FireCrawlParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -18,7 +22,7 @@ func InitFirecrawlMCPClient(filecrawlApiKey, protocolVersion string, clientInfo 
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"FIRECRAWL_API_KEY=" + filecrawlApiKey,
+				"FIRECRAWL_API_KEY=" + p.FilecrawlApiKey,
 			},
 			Args: []string{
 				"-y",

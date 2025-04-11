@@ -9,7 +9,12 @@ const (
 	NodeChatsumMcpServer = "node-chatsum-mcp-server"
 )
 
-func InitChatsumMCPClient(chatDBPath, indexJsPath string, protocolVersion string, clientInfo *mcp.Implementation,
+type ChatsumParam struct {
+	chatDBPath  string
+	indexJsPath string
+}
+
+func InitChatsumMCPClient(p *ChatsumParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -18,10 +23,10 @@ func InitChatsumMCPClient(chatDBPath, indexJsPath string, protocolVersion string
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "node",
 			Env: []string{
-				"CHAT_DB_PATH=" + chatDBPath,
+				"CHAT_DB_PATH=" + p.chatDBPath,
 			},
 			Args: []string{
-				indexJsPath,
+				p.indexJsPath,
 			},
 			InitReq: mcp.InitializeRequest{},
 		},

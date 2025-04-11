@@ -12,7 +12,9 @@ import (
 )
 
 func main() {
-	mc := mcpTime.InitTimeMCPClient("", "", nil, nil, nil)
+	mc := mcpTime.InitTimeMCPClient(&mcpTime.TimeParma{
+		LocalTimezone: "Asia/Tokyo",
+	}, "", nil, nil, nil)
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)

@@ -34,7 +34,9 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "browser_tab_list", map[string]interface{}{})
+	data, err := c.ExecTools(ctx, "browser_navigate", map[string]interface{}{
+		"url": "http://localhost:8931/sse",
+	})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)
 	}

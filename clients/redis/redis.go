@@ -10,7 +10,11 @@ const (
 	DockerRedisMcpServer = "docker-redis-mcp-server"
 )
 
-func InitRedisMCPClient(redisPath, protocolVersion string, clientInfo *mcp.Implementation,
+type RedisParam struct {
+	RedisPath string
+}
+
+func InitRedisMCPClient(p *RedisParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -22,7 +26,7 @@ func InitRedisMCPClient(redisPath, protocolVersion string, clientInfo *mcp.Imple
 			Args: []string{
 				"-y",
 				"@modelcontextprotocol/server-redis",
-				redisPath,
+				p.RedisPath,
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
@@ -47,7 +51,7 @@ func InitRedisMCPClient(redisPath, protocolVersion string, clientInfo *mcp.Imple
 	return redisMCPClient
 }
 
-func InitDockerRedisMCPClient(redisPath string, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerRedisMCPClient(p *RedisParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -60,7 +64,7 @@ func InitDockerRedisMCPClient(redisPath string, protocolVersion string, clientIn
 				"-i",
 				"--rm",
 				"mcp/redis",
-				redisPath,
+				p.RedisPath,
 			},
 			InitReq: mcp.InitializeRequest{},
 		},

@@ -10,7 +10,11 @@ const (
 	NpxPlaywrightMcpServer = "npx-playwright-mcp-server"
 )
 
-func InitPlaywrightMCPClient(args []string, protocolVersion string, clientInfo *mcp.Implementation,
+type PlaywrightParam struct {
+	Args []string
+}
+
+func InitPlaywrightMCPClient(p *PlaywrightParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -29,7 +33,7 @@ func InitPlaywrightMCPClient(args []string, protocolVersion string, clientInfo *
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	playwrightMCPClient.StdioClientConf.Args = append(playwrightMCPClient.StdioClientConf.Args, args...)
+	playwrightMCPClient.StdioClientConf.Args = append(playwrightMCPClient.StdioClientConf.Args, p.Args...)
 
 	initRequest := mcp.InitializeRequest{}
 	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION

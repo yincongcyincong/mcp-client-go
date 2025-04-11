@@ -9,7 +9,11 @@ const (
 	NpxEverartMcpServer = "npx-everart-mcp-server"
 )
 
-func InitEverartMCPClient(everartApiKey string, protocolVersion string, clientInfo *mcp.Implementation,
+type EverartParam struct {
+	EverartApiKey string
+}
+
+func InitEverartMCPClient(p *EverartParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -18,7 +22,7 @@ func InitEverartMCPClient(everartApiKey string, protocolVersion string, clientIn
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"EVERART_API_KEY=" + everartApiKey,
+				"EVERART_API_KEY=" + p.EverartApiKey,
 			},
 			Args: []string{
 				"-y",

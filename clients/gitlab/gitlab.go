@@ -10,7 +10,12 @@ const (
 	DockerGitlabMcpServer = "docker-gitlab-mcp-server"
 )
 
-func InitGitlabMCPClient(gitlabApiKey, gitlabUrl, protocolVersion string, clientInfo *mcp.Implementation,
+type GitlabParam struct {
+	GitlabApiKey string
+	GitlabUrl    string
+}
+
+func InitGitlabMCPClient(p *GitlabParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -19,8 +24,8 @@ func InitGitlabMCPClient(gitlabApiKey, gitlabUrl, protocolVersion string, client
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"GITLAB_PERSONAL_ACCESS_TOKEN=" + gitlabApiKey,
-				"GITLAB_API_URL" + gitlabUrl, // Optional, for self-hosted instances
+				"GITLAB_PERSONAL_ACCESS_TOKEN=" + p.GitlabApiKey,
+				"GITLAB_API_URL" + p.GitlabUrl, // Optional, for self-hosted instances
 			},
 			Args: []string{
 				"-y",
@@ -49,7 +54,7 @@ func InitGitlabMCPClient(gitlabApiKey, gitlabUrl, protocolVersion string, client
 	return gitlabMCPClient
 }
 
-func InitDockerGitlabMCPClient(gitlabApiKey, gitlabUrl, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerGitlabMCPClient(p *GitlabParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -58,8 +63,8 @@ func InitDockerGitlabMCPClient(gitlabApiKey, gitlabUrl, protocolVersion string, 
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "docker",
 			Env: []string{
-				"GITLAB_PERSONAL_ACCESS_TOKEN=" + gitlabApiKey,
-				"GITLAB_API_URL" + gitlabUrl, // Optional, for self-hosted instances
+				"GITLAB_PERSONAL_ACCESS_TOKEN=" + p.GitlabApiKey,
+				"GITLAB_API_URL" + p.GitlabUrl, // Optional, for self-hosted instances
 			},
 			Args: []string{
 				"run",
