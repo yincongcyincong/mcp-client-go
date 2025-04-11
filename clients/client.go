@@ -23,15 +23,10 @@ type MCPClient struct {
 	Tools       []mcp.Tool
 }
 
-const (
-	SSEType   = "sse"
-	StdioType = "stdio"
-)
-
 func RegisterMCPClient(ctx context.Context, params []*param.MCPClientConf) []error {
 	errs := make([]error, 0)
 	for _, clientParam := range params {
-		if clientParam.SSEClientConf == nil || clientParam.ClientType != SSEType {
+		if clientParam.SSEClientConf == nil || clientParam.ClientType != param.SSEType {
 			err := createStdioMCPClient(ctx, clientParam)
 			if err != nil {
 				errs = append(errs, err)
@@ -57,7 +52,12 @@ func createSSEMCPClient(ctx context.Context, clientParam *param.MCPClientConf) e
 		return err
 	}
 
-	initResult, err := c.Initialize(ctx, clientParam.StdioClientConf.InitReq)
+	err = c.Start(ctx)
+	if err != nil {
+		return err
+	}
+
+	initResult, err := c.Initialize(ctx, clientParam.SSEClientConf.InitReq)
 	if err != nil {
 		return err
 	}
@@ -113,7 +113,7 @@ func InitStdioMCPClient(name, command string, env, args []string, initReq mcp.In
 
 	amapMCPClient := &param.MCPClientConf{
 		Name:       name,
-		ClientType: StdioType,
+		ClientType: param.StdioType,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: command,
 			Env:     env,
@@ -133,7 +133,7 @@ func InitSSEMCPClient(name, baseUrl string, options []client.ClientOption,
 
 	amapMCPClient := &param.MCPClientConf{
 		Name:       name,
-		ClientType: SSEType,
+		ClientType: param.SSEType,
 		SSEClientConf: &param.SSEClientConfig{
 			Options: options,
 			BaseUrl: baseUrl,
@@ -179,7 +179,7 @@ func (m *MCPClient) GetAllTools(ctx context.Context, cursor mcp.Cursor) ([]mcp.T
 
 	var tools *mcp.ListToolsResult
 	var err error
-	if m.Conf.SSEClientConf == nil || m.Conf.Name != SSEType {
+	if m.Conf.SSEClientConf == nil || m.Conf.ClientType != param.SSEType {
 		tools, err = m.StdioClient.ListTools(ctx, toolsRequest)
 	} else {
 		tools, err = m.SSEClient.ListTools(ctx, toolsRequest)
@@ -228,7 +228,7 @@ func (m *MCPClient) ExecTools(ctx context.Context, name string, params map[strin
 	var result *mcp.CallToolResult
 	var err error
 
-	if m.Conf.SSEClientConf == nil || m.Conf.Name != SSEType {
+	if m.Conf.SSEClientConf == nil || m.Conf.ClientType != param.SSEType {
 		result, err = m.StdioClient.CallTool(ctx, reqTool)
 	} else {
 		result, err = m.SSEClient.CallTool(ctx, reqTool)

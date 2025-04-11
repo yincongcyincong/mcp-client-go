@@ -5,6 +5,11 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
+const (
+	SSEType   = "sse"
+	StdioType = "stdio"
+)
+
 type MCPClientConf struct {
 	Name            string
 	ClientType      string
@@ -25,4 +30,5 @@ type StdioClientConfig struct {
 type SSEClientConfig struct {
 	Options []client.ClientOption
 	BaseUrl string
+	InitReq mcp.InitializeRequest
 }
