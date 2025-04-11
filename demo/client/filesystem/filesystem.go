@@ -5,15 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/yincongcyincong/mcp-client-go/clients"
-	"github.com/yincongcyincong/mcp-client-go/clients/amap"
+	"github.com/yincongcyincong/mcp-client-go/clients/filesystem"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"log"
 	"time"
 )
 
 func main() {
-	// todo modify token
-	mc := amap.InitAmapMCPClient("xxxx", "", nil, nil, nil)
+	mc := filesystem.InitFilesystemMCPClient([]string{"/Users/yincong/"}, "", nil, nil, nil)
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -24,7 +23,7 @@ func main() {
 		log.Fatal("InitMCPClient failed:", err)
 	}
 
-	c, err := clients.GetMCPClient(amap.NpxAmapMapsMcpServer)
+	c, err := clients.GetMCPClient(filesystem.NpxFilesystemMcpServer)
 	if err != nil {
 		log.Fatal("GetMCPClient failed:", err)
 	}
@@ -34,16 +33,8 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "maps_regeocode", map[string]interface{}{
-		"location": "117.1935, 39.1425",
-	})
-	if err != nil {
-		log.Fatal("ExecTools failed:", err)
-	}
-	fmt.Println(data)
-
-	data, err = c.ExecTools(ctx, "maps_ip_location", map[string]interface{}{
-		"ip": "220.181.3.151",
+	data, err := c.ExecTools(ctx, "list_directory", map[string]interface{}{
+		"path": "/Users/yincong/go/src/github.com/yincongcyincong",
 	})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)

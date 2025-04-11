@@ -11,7 +11,7 @@ const (
 	DockerFilesystemServer = "docker-filesystem-mcp-server"
 )
 
-func InitFilesystemMCPClient(srcPath, dstPath string, protocolVersion string, clientInfo *mcp.Implementation,
+func InitFilesystemMCPClient(paths []string, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
@@ -22,13 +22,13 @@ func InitFilesystemMCPClient(srcPath, dstPath string, protocolVersion string, cl
 		Args: []string{
 			"-y",
 			"@modelcontextprotocol/server-filesystem",
-			srcPath,
-			dstPath,
 		},
 		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
+
+	filesystemMCPClient.Args = append(filesystemMCPClient.Args, paths...)
 
 	initRequest := mcp.InitializeRequest{}
 	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
