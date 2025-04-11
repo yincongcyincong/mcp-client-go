@@ -10,13 +10,15 @@ import (
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"github.com/yincongcyincong/mcp-client-go/utils"
 	"log"
+	"net/http"
+	"net/url"
 )
 
 func main() {
 	mcpParams := make([]*param.MCPClientConf, 0)
 
 	// todo add modify api key
-	amapApiKey := "29572e42530ac949d37a7d00e5d51f4a"
+	amapApiKey := "xxx"
 	mcpParams = append(mcpParams,
 		amap.InitAmapMCPClient(amapApiKey, "", nil, nil, nil))
 	errs := clients.RegisterMCPClient(context.Background(), mcpParams)
@@ -34,18 +36,18 @@ func main() {
 	// todo modify deepseek token
 	openAIkey := "xxx"
 
-	//proxy, err := url.Parse("http://127.0.0.1:7890")
-	//if err != nil {
-	//	log.Fatal("parse deepseek proxy error", "err", err)
-	//}
+	proxy, err := url.Parse("http://127.0.0.1:7890")
+	if err != nil {
+		log.Fatal("parse deepseek proxy error", "err", err)
+	}
 
 	config := openai.DefaultConfig(openAIkey)
-	//config.HTTPClient = &http.Client{
-	//	Transport: &http.Transport{
-	//		Proxy: http.ProxyURL(proxy),
-	//	},
-	//}
-	//config.BaseURL = "https://api.chatanywhere.org"
+	config.HTTPClient = &http.Client{
+		Transport: &http.Transport{
+			Proxy: http.ProxyURL(proxy),
+		},
+	}
+	config.BaseURL = "https://api.chatanywhere.org"
 	client := openai.NewClientWithConfig(config)
 
 	ctx := context.Background()
