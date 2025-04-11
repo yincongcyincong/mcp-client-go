@@ -1,4 +1,4 @@
-package firecrawl
+package main
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 func main() {
 	// todo modify token
 	mc := firecrawl.InitFirecrawlMCPClient(&firecrawl.FireCrawlParam{
-		FilecrawlApiKey: "xxx",
+		FilecrawlApiKey: "fc-xxxx",
 	}, "", nil, nil, nil)
 
 	// Create context with timeout
@@ -36,7 +36,13 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "list_commits", map[string]interface{}{})
+	data, err := c.ExecTools(ctx, "firecrawl_batch_scrape", map[string]interface{}{
+		"urls": []string{"https://baidu.com"},
+		"options": map[string]interface{}{
+			"formats":         []string{"markdown"},
+			"onlyMainContent": true,
+		},
+	})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)
 	}
