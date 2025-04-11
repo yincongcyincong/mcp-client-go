@@ -14,16 +14,17 @@ func InitTavilyMCPClient(tavilyApiKey string, protocolVersion string, clientInfo
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	tavilyMCPClient := &param.MCPClientConf{
-		Name:    NpxTavilyMcpServer,
-		Command: "npx",
-		Env: []string{
-			"TAVILY_API_KEY=" + tavilyApiKey,
+		Name: NpxTavilyMcpServer,
+		StdioClientConf: &param.StdioClientConfig{Command: "npx",
+			Env: []string{
+				"TAVILY_API_KEY=" + tavilyApiKey,
+			},
+			Args: []string{
+				"-y",
+				"tavily-mcp@0.1.4",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"tavily-mcp@0.1.4",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -40,7 +41,7 @@ func InitTavilyMCPClient(tavilyApiKey string, protocolVersion string, clientInfo
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	tavilyMCPClient.InitReq = initRequest
+	tavilyMCPClient.StdioClientConf.InitReq = initRequest
 
 	return tavilyMCPClient
 }

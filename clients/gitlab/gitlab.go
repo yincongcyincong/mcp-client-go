@@ -15,17 +15,19 @@ func InitGitlabMCPClient(gitlabApiKey, gitlabUrl, protocolVersion string, client
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	gitlabMCPClient := &param.MCPClientConf{
-		Name:    NpxGitlabMcpServer,
-		Command: "npx",
-		Env: []string{
-			"GITLAB_PERSONAL_ACCESS_TOKEN=" + gitlabApiKey,
-			"GITLAB_API_URL" + gitlabUrl, // Optional, for self-hosted instances
+		Name: NpxGitlabMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"GITLAB_PERSONAL_ACCESS_TOKEN=" + gitlabApiKey,
+				"GITLAB_API_URL" + gitlabUrl, // Optional, for self-hosted instances
+			},
+			Args: []string{
+				"-y",
+				"@modelcontextprotocol/server-gitlab",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"@modelcontextprotocol/server-gitlab",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -42,7 +44,7 @@ func InitGitlabMCPClient(gitlabApiKey, gitlabUrl, protocolVersion string, client
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	gitlabMCPClient.InitReq = initRequest
+	gitlabMCPClient.StdioClientConf.InitReq = initRequest
 
 	return gitlabMCPClient
 }
@@ -52,23 +54,25 @@ func InitDockerGitlabMCPClient(gitlabApiKey, gitlabUrl, protocolVersion string, 
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	gitlabMCPClient := &param.MCPClientConf{
-		Name:    DockerGitlabMcpServer,
-		Command: "docker",
-		Env: []string{
-			"GITLAB_PERSONAL_ACCESS_TOKEN=" + gitlabApiKey,
-			"GITLAB_API_URL" + gitlabUrl, // Optional, for self-hosted instances
+		Name: DockerGitlabMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "docker",
+			Env: []string{
+				"GITLAB_PERSONAL_ACCESS_TOKEN=" + gitlabApiKey,
+				"GITLAB_API_URL" + gitlabUrl, // Optional, for self-hosted instances
+			},
+			Args: []string{
+				"run",
+				"--rm",
+				"-i",
+				"-e",
+				"GITLAB_PERSONAL_ACCESS_TOKEN",
+				"-e",
+				"GITLAB_API_URL",
+				"mcp/gitlab",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"run",
-			"--rm",
-			"-i",
-			"-e",
-			"GITLAB_PERSONAL_ACCESS_TOKEN",
-			"-e",
-			"GITLAB_API_URL",
-			"mcp/gitlab",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -85,7 +89,7 @@ func InitDockerGitlabMCPClient(gitlabApiKey, gitlabUrl, protocolVersion string, 
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	gitlabMCPClient.InitReq = initRequest
+	gitlabMCPClient.StdioClientConf.InitReq = initRequest
 
 	return gitlabMCPClient
 }

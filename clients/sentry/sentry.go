@@ -15,15 +15,17 @@ func InitSentryMCPClient(sentryToken, protocolVersion string, clientInfo *mcp.Im
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	sentryMCPClient := &param.MCPClientConf{
-		Name:    UvxSentryMcpServer,
-		Command: "npx",
-		Env:     []string{},
-		Args: []string{
-			"mcp-server-sentry",
-			"--auth-token",
-			sentryToken,
+		Name: UvxSentryMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env:     []string{},
+			Args: []string{
+				"mcp-server-sentry",
+				"--auth-token",
+				sentryToken,
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -40,7 +42,7 @@ func InitSentryMCPClient(sentryToken, protocolVersion string, clientInfo *mcp.Im
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	sentryMCPClient.InitReq = initRequest
+	sentryMCPClient.StdioClientConf.InitReq = initRequest
 
 	return sentryMCPClient
 }
@@ -50,18 +52,20 @@ func InitDockerSentryMCPClient(sentryToken, protocolVersion string, clientInfo *
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	sentryMCPClient := &param.MCPClientConf{
-		Name:    DockerSentryMcpServer,
-		Command: "docker",
-		Env:     []string{},
-		Args: []string{
-			"run",
-			"-i",
-			"--rm",
-			"mcp/sentry",
-			"--auth-token",
-			sentryToken,
+		Name: DockerSentryMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "docker",
+			Env:     []string{},
+			Args: []string{
+				"run",
+				"-i",
+				"--rm",
+				"mcp/sentry",
+				"--auth-token",
+				sentryToken,
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -78,7 +82,7 @@ func InitDockerSentryMCPClient(sentryToken, protocolVersion string, clientInfo *
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	sentryMCPClient.InitReq = initRequest
+	sentryMCPClient.StdioClientConf.InitReq = initRequest
 
 	return sentryMCPClient
 }

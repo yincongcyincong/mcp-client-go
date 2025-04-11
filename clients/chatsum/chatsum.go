@@ -14,15 +14,17 @@ func InitChatsumMCPClient(chatDBPath, indexJsPath string, protocolVersion string
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	chatsumMCPClient := &param.MCPClientConf{
-		Name:    NodeChatsumMcpServer,
-		Command: "node",
-		Env: []string{
-			"CHAT_DB_PATH=" + chatDBPath,
+		Name: NodeChatsumMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "node",
+			Env: []string{
+				"CHAT_DB_PATH=" + chatDBPath,
+			},
+			Args: []string{
+				indexJsPath,
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			indexJsPath,
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -39,7 +41,7 @@ func InitChatsumMCPClient(chatDBPath, indexJsPath string, protocolVersion string
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	chatsumMCPClient.InitReq = initRequest
+	chatsumMCPClient.StdioClientConf.InitReq = initRequest
 
 	return chatsumMCPClient
 }

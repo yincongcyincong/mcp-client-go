@@ -19,9 +19,9 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
 
-	err := clients.RegisterMCPClient(ctx, []*param.MCPClientConf{mc})
-	if err != nil {
-		log.Fatal("InitMCPClient failed:", err)
+	errs := clients.RegisterMCPClient(ctx, []*param.MCPClientConf{mc})
+	if len(errs) > 0 {
+		log.Fatal("InitMCPClient failed:", errs)
 	}
 
 	c, err := clients.GetMCPClient(github.NpxModelContextProtocolServerGithub)

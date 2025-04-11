@@ -1,16 +1,28 @@
 package param
 
 import (
+	"github.com/mark3labs/mcp-go/client"
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
 type MCPClientConf struct {
-	Name    string
+	Name            string
+	ClientType      string
+	SSEClientConf   *SSEClientConfig
+	StdioClientConf *StdioClientConfig
+
+	ToolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error
+	ToolsAfterFunc  map[string]func(req *mcp.CallToolResult) (string, error)
+}
+
+type StdioClientConfig struct {
 	Command string
 	Env     []string
 	Args    []string
 	InitReq mcp.InitializeRequest
-	
-	ToolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error
-	ToolsAfterFunc  map[string]func(req *mcp.CallToolResult) (string, error)
+}
+
+type SSEClientConfig struct {
+	Options []client.ClientOption
+	BaseUrl string
 }

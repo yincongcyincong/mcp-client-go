@@ -16,56 +16,128 @@ var (
 )
 
 type MCPClient struct {
-	Conf    *param.MCPClientConf
-	Client  *client.StdioMCPClient
-	InitReq *mcp.InitializeResult
-	Tools   []mcp.Tool
+	Conf        *param.MCPClientConf
+	StdioClient *client.StdioMCPClient
+	SSEClient   *client.SSEMCPClient
+	InitReq     *mcp.InitializeResult
+	Tools       []mcp.Tool
 }
 
-func RegisterMCPClient(ctx context.Context, params []*param.MCPClientConf) error {
+const (
+	SSEType   = "sse"
+	StdioType = "stdio"
+)
+
+func RegisterMCPClient(ctx context.Context, params []*param.MCPClientConf) []error {
+	errs := make([]error, 0)
 	for _, clientParam := range params {
-		c, err := client.NewStdioMCPClient(
-			clientParam.Command,
-			clientParam.Env,
-			clientParam.Args...,
-		)
-		if err != nil {
-			return err
+		if clientParam.SSEClientConf == nil || clientParam.ClientType != SSEType {
+			err := createStdioMCPClient(ctx, clientParam)
+			if err != nil {
+				errs = append(errs, err)
+			}
+		} else {
+			err := createSSEMCPClient(ctx, clientParam)
+			if err != nil {
+				errs = append(errs, err)
+			}
 		}
-
-		initResult, err := c.Initialize(ctx, clientParam.InitReq)
-		if err != nil {
-			return err
-		}
-
-		mc := &MCPClient{
-			Conf:    clientParam,
-			Client:  c,
-			InitReq: initResult,
-		}
-		tools, err := mc.GetAllTools(ctx, "")
-		if err != nil {
-			return err
-		}
-		mc.Tools = tools
-
-		mcpClients.Store(clientParam.Name, mc)
 
 	}
 
+	return errs
+}
+
+func createSSEMCPClient(ctx context.Context, clientParam *param.MCPClientConf) error {
+	c, err := client.NewSSEMCPClient(
+		clientParam.SSEClientConf.BaseUrl,
+		clientParam.SSEClientConf.Options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	initResult, err := c.Initialize(ctx, clientParam.StdioClientConf.InitReq)
+	if err != nil {
+		return err
+	}
+
+	mc := &MCPClient{
+		Conf:      clientParam,
+		SSEClient: c,
+		InitReq:   initResult,
+	}
+	tools, err := mc.GetAllTools(ctx, "")
+	if err != nil {
+		return err
+	}
+	mc.Tools = tools
+
+	mcpClients.Store(clientParam.Name, mc)
 	return nil
 }
 
-func InitMCPClient(name, command string, env, args []string, initReq mcp.InitializeRequest,
+func createStdioMCPClient(ctx context.Context, clientParam *param.MCPClientConf) error {
+	c, err := client.NewStdioMCPClient(
+		clientParam.StdioClientConf.Command,
+		clientParam.StdioClientConf.Env,
+		clientParam.StdioClientConf.Args...,
+	)
+	if err != nil {
+		return err
+	}
+
+	initResult, err := c.Initialize(ctx, clientParam.StdioClientConf.InitReq)
+	if err != nil {
+		return err
+	}
+
+	mc := &MCPClient{
+		Conf:        clientParam,
+		StdioClient: c,
+		InitReq:     initResult,
+	}
+	tools, err := mc.GetAllTools(ctx, "")
+	if err != nil {
+		return err
+	}
+	mc.Tools = tools
+
+	mcpClients.Store(clientParam.Name, mc)
+	return nil
+}
+
+func InitStdioMCPClient(name, command string, env, args []string, initReq mcp.InitializeRequest,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	amapMCPClient := &param.MCPClientConf{
-		Name:            name,
-		Command:         command,
-		Env:             env,
-		Args:            args,
-		InitReq:         initReq,
+		Name:       name,
+		ClientType: StdioType,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: command,
+			Env:     env,
+			Args:    args,
+			InitReq: initReq,
+		},
+		ToolsBeforeFunc: toolsBeforeFunc,
+		ToolsAfterFunc:  toolsAfterFunc,
+	}
+
+	return amapMCPClient
+}
+
+func InitSSEMCPClient(name, baseUrl string, options []client.ClientOption,
+	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
+	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+
+	amapMCPClient := &param.MCPClientConf{
+		Name:       name,
+		ClientType: SSEType,
+		SSEClientConf: &param.SSEClientConfig{
+			Options: options,
+			BaseUrl: baseUrl,
+		},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -104,7 +176,15 @@ func GetMCPClientByToolName(toolName string) (*MCPClient, error) {
 func (m *MCPClient) GetAllTools(ctx context.Context, cursor mcp.Cursor) ([]mcp.Tool, error) {
 	toolsRequest := mcp.ListToolsRequest{}
 	toolsRequest.Params.Cursor = cursor
-	tools, err := m.Client.ListTools(ctx, toolsRequest)
+
+	var tools *mcp.ListToolsResult
+	var err error
+	if m.Conf.SSEClientConf == nil || m.Conf.Name != SSEType {
+		tools, err = m.StdioClient.ListTools(ctx, toolsRequest)
+	} else {
+		tools, err = m.SSEClient.ListTools(ctx, toolsRequest)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -145,8 +225,14 @@ func (m *MCPClient) ExecTools(ctx context.Context, name string, params map[strin
 			return "", err
 		}
 	}
+	var result *mcp.CallToolResult
+	var err error
 
-	result, err := m.Client.CallTool(ctx, reqTool)
+	if m.Conf.SSEClientConf == nil || m.Conf.Name != SSEType {
+		result, err = m.StdioClient.CallTool(ctx, reqTool)
+	} else {
+		result, err = m.SSEClient.CallTool(ctx, reqTool)
+	}
 	if err != nil {
 		return "", err
 	}

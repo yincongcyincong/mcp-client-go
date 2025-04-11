@@ -14,16 +14,18 @@ func InitFlomoMCPClient(filecrawlApiUrl, protocolVersion string, clientInfo *mcp
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	flomoMCPClient := &param.MCPClientConf{
-		Name:    NpxFlomoMcpServer,
-		Command: "npx",
-		Env: []string{
-			"FLOMO_API_URL=" + filecrawlApiUrl,
+		Name: NpxFlomoMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"FLOMO_API_URL=" + filecrawlApiUrl,
+			},
+			Args: []string{
+				"-y",
+				"@chatmcp/mcp-server-flomo",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"@chatmcp/mcp-server-flomo",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -40,7 +42,7 @@ func InitFlomoMCPClient(filecrawlApiUrl, protocolVersion string, clientInfo *mcp
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	flomoMCPClient.InitReq = initRequest
+	flomoMCPClient.StdioClientConf.InitReq = initRequest
 
 	return flomoMCPClient
 }

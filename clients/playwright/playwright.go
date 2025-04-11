@@ -14,13 +14,15 @@ func InitPlaywrightMCPClient(protocolVersion string, clientInfo *mcp.Implementat
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	playwrightMCPClient := &param.MCPClientConf{
-		Name:    NpxPlaywrightMcpServer,
-		Command: "npx",
-		Args: []string{
-			"-y",
-			"@playwright/mcp@latest",
+		Name: NpxPlaywrightMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Args: []string{
+				"-y",
+				"@playwright/mcp@latest",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -37,7 +39,7 @@ func InitPlaywrightMCPClient(protocolVersion string, clientInfo *mcp.Implementat
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	playwrightMCPClient.InitReq = initRequest
+	playwrightMCPClient.StdioClientConf.InitReq = initRequest
 
 	return playwrightMCPClient
 }

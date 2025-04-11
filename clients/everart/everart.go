@@ -14,16 +14,18 @@ func InitEverartMCPClient(everartApiKey string, protocolVersion string, clientIn
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	everartMCPClient := &param.MCPClientConf{
-		Name:    NpxEverartMcpServer,
-		Command: "npx",
-		Env: []string{
-			"EVERART_API_KEY=" + everartApiKey,
+		Name: NpxEverartMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"EVERART_API_KEY=" + everartApiKey,
+			},
+			Args: []string{
+				"-y",
+				"@modelcontextprotocol/server-everart",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"@modelcontextprotocol/server-everart",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -40,7 +42,7 @@ func InitEverartMCPClient(everartApiKey string, protocolVersion string, clientIn
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	everartMCPClient.InitReq = initRequest
+	everartMCPClient.StdioClientConf.InitReq = initRequest
 
 	return everartMCPClient
 }

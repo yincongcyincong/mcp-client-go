@@ -15,18 +15,20 @@ func InitAwsMCPClient(awsAccessKey, awsSecretKey, awsRegion string, protocolVers
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	awsMCPClient := &param.MCPClientConf{
-		Name:    NpxAwsMcpServer,
-		Command: "npx",
-		Env: []string{
-			"AWS_ACCESS_KEY_ID=" + awsAccessKey,
-			"AWS_SECRET_ACCESS_KEY=" + awsSecretKey,
-			"AWS_REGION=" + awsRegion,
+		Name: NpxAwsMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"AWS_ACCESS_KEY_ID=" + awsAccessKey,
+				"AWS_SECRET_ACCESS_KEY=" + awsSecretKey,
+				"AWS_REGION=" + awsRegion,
+			},
+			Args: []string{
+				"-y",
+				"@modelcontextprotocol/server-aws-kb-retrieval",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"@modelcontextprotocol/server-aws-kb-retrieval",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -43,7 +45,7 @@ func InitAwsMCPClient(awsAccessKey, awsSecretKey, awsRegion string, protocolVers
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	awsMCPClient.InitReq = initRequest
+	awsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return awsMCPClient
 }
@@ -53,23 +55,25 @@ func InitDockerAwsMCPClient(awsAccessKey, awsSecretKey, awsRegion string, protoc
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	awsMCPClient := &param.MCPClientConf{
-		Name:    DockerAwsMcpServer,
-		Command: "npx",
-		Env: []string{
-			"AWS_ACCESS_KEY_ID=" + awsAccessKey,
-			"AWS_SECRET_ACCESS_KEY=" + awsSecretKey,
-			"AWS_REGION=" + awsRegion,
+		Name: DockerAwsMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"AWS_ACCESS_KEY_ID=" + awsAccessKey,
+				"AWS_SECRET_ACCESS_KEY=" + awsSecretKey,
+				"AWS_REGION=" + awsRegion,
+			},
+			Args: []string{
+				"run",
+				"-i",
+				"--rm",
+				"-e", "AWS_ACCESS_KEY_ID",
+				"-e", "AWS_SECRET_ACCESS_KEY",
+				"-e", "AWS_REGION",
+				"mcp/aws-kb-retrieval-server",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"run",
-			"-i",
-			"--rm",
-			"-e", "AWS_ACCESS_KEY_ID",
-			"-e", "AWS_SECRET_ACCESS_KEY",
-			"-e", "AWS_REGION",
-			"mcp/aws-kb-retrieval-server",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -86,7 +90,7 @@ func InitDockerAwsMCPClient(awsAccessKey, awsSecretKey, awsRegion string, protoc
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	awsMCPClient.InitReq = initRequest
+	awsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return awsMCPClient
 }

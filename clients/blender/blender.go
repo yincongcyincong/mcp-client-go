@@ -14,13 +14,15 @@ func InitBlenderMCPClient(protocolVersion string, clientInfo *mcp.Implementation
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	blenderMCPClient := &param.MCPClientConf{
-		Name:    UvxBlenderMcpServer,
-		Command: "uvx",
-		Env:     []string{},
-		Args: []string{
-			"blender-mcp",
+		Name: UvxBlenderMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "uvx",
+			Env:     []string{},
+			Args: []string{
+				"blender-mcp",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -37,7 +39,7 @@ func InitBlenderMCPClient(protocolVersion string, clientInfo *mcp.Implementation
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	blenderMCPClient.InitReq = initRequest
+	blenderMCPClient.StdioClientConf.InitReq = initRequest
 
 	return blenderMCPClient
 }

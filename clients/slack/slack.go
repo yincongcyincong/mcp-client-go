@@ -15,17 +15,19 @@ func InitSlackMCPClient(slackBotToken, slackTeamID, protocolVersion string, clie
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	slackMCPClient := &param.MCPClientConf{
-		Name:    NpxSlackMcpServer,
-		Command: "npx",
-		Env: []string{
-			"SLACK_BOT_TOKEN=" + slackBotToken,
-			"SLACK_TEAM_ID=" + slackTeamID,
+		Name: NpxSlackMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"SLACK_BOT_TOKEN=" + slackBotToken,
+				"SLACK_TEAM_ID=" + slackTeamID,
+			},
+			Args: []string{
+				"-y",
+				"@modelcontextprotocol/server-slack",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"@modelcontextprotocol/server-slack",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -42,7 +44,7 @@ func InitSlackMCPClient(slackBotToken, slackTeamID, protocolVersion string, clie
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	slackMCPClient.InitReq = initRequest
+	slackMCPClient.StdioClientConf.InitReq = initRequest
 
 	return slackMCPClient
 }
@@ -52,23 +54,25 @@ func InitDockerSlackMCPClient(slackBotToken, slackTeamID, protocolVersion string
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	slackMCPClient := &param.MCPClientConf{
-		Name:    DockerSlackMcpServer,
-		Command: "docker",
-		Env: []string{
-			"SLACK_BOT_TOKEN=" + slackBotToken,
-			"SLACK_TEAM_ID=" + slackTeamID,
+		Name: DockerSlackMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "docker",
+			Env: []string{
+				"SLACK_BOT_TOKEN=" + slackBotToken,
+				"SLACK_TEAM_ID=" + slackTeamID,
+			},
+			Args: []string{
+				"run",
+				"-i",
+				"--rm",
+				"-e",
+				"SLACK_BOT_TOKEN",
+				"-e",
+				"SLACK_TEAM_ID",
+				"mcp/slack",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"run",
-			"-i",
-			"--rm",
-			"-e",
-			"SLACK_BOT_TOKEN",
-			"-e",
-			"SLACK_TEAM_ID",
-			"mcp/slack",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -85,7 +89,7 @@ func InitDockerSlackMCPClient(slackBotToken, slackTeamID, protocolVersion string
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	slackMCPClient.InitReq = initRequest
+	slackMCPClient.StdioClientConf.InitReq = initRequest
 
 	return slackMCPClient
 }

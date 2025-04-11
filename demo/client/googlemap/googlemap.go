@@ -18,9 +18,9 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	err := clients.RegisterMCPClient(ctx, []*param.MCPClientConf{mc})
-	if err != nil {
-		log.Fatal("InitMCPClient failed:", err)
+	errs := clients.RegisterMCPClient(ctx, []*param.MCPClientConf{mc})
+	if len(errs) > 0 {
+		log.Fatal("InitMCPClient failed:", errs)
 	}
 
 	c, err := clients.GetMCPClient(googlemap.NpxGooglemapMcpServer)

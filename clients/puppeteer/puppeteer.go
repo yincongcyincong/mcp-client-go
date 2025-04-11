@@ -15,14 +15,16 @@ func InitPuppeteerMCPClient(protocolVersion string, clientInfo *mcp.Implementati
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	puppeteerMCPClient := &param.MCPClientConf{
-		Name:    NpxPuppeteerMcpServer,
-		Command: "npx",
-		Env:     []string{},
-		Args: []string{
-			"-y",
-			"@modelcontextprotocol/server-puppeteer",
+		Name: NpxPuppeteerMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env:     []string{},
+			Args: []string{
+				"-y",
+				"@modelcontextprotocol/server-puppeteer",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -39,7 +41,7 @@ func InitPuppeteerMCPClient(protocolVersion string, clientInfo *mcp.Implementati
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	puppeteerMCPClient.InitReq = initRequest
+	puppeteerMCPClient.StdioClientConf.InitReq = initRequest
 
 	return puppeteerMCPClient
 }
@@ -49,18 +51,20 @@ func InitDockerPuppeteerMCPClient(protocolVersion string, clientInfo *mcp.Implem
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	puppeteerMCPClient := &param.MCPClientConf{
-		Name:    DockerPuppeteerMcpServer,
-		Command: "docker",
-		Env:     []string{},
-		Args: []string{
-			"run",
-			"-i",
-			"--rm",
-			"--init",
-			"-e", "DOCKER_CONTAINER=true",
-			"mcp/puppeteer",
+		Name: DockerPuppeteerMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "docker",
+			Env:     []string{},
+			Args: []string{
+				"run",
+				"-i",
+				"--rm",
+				"--init",
+				"-e", "DOCKER_CONTAINER=true",
+				"mcp/puppeteer",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -77,7 +81,7 @@ func InitDockerPuppeteerMCPClient(protocolVersion string, clientInfo *mcp.Implem
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	puppeteerMCPClient.InitReq = initRequest
+	puppeteerMCPClient.StdioClientConf.InitReq = initRequest
 
 	return puppeteerMCPClient
 }

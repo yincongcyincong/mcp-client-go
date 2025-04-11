@@ -15,16 +15,18 @@ func InitModelContextProtocolGithubMCPClient(githubAccessToken string, protocolV
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	amapMCPClient := &param.MCPClientConf{
-		Name:    NpxModelContextProtocolGithubServer,
-		Command: "npx",
-		Env: []string{
-			"GITHUB_PERSONAL_ACCESS_TOKEN=" + githubAccessToken,
+		Name: NpxModelContextProtocolGithubServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"GITHUB_PERSONAL_ACCESS_TOKEN=" + githubAccessToken,
+			},
+			Args: []string{
+				"-y",
+				"@modelcontextprotocol/server-github",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"@modelcontextprotocol/server-github",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -43,7 +45,7 @@ func InitModelContextProtocolGithubMCPClient(githubAccessToken string, protocolV
 		initRequest.Params.ClientInfo = *clientInfo
 	}
 
-	amapMCPClient.InitReq = initRequest
+	amapMCPClient.StdioClientConf.InitReq = initRequest
 
 	return amapMCPClient
 }
@@ -53,20 +55,22 @@ func InitDockerGithubMCPClient(githubAccessToken string, protocolVersion string,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	amapMCPClient := &param.MCPClientConf{
-		Name:    DockerGithubServer,
-		Command: "docker",
-		Env: []string{
-			"GITHUB_PERSONAL_ACCESS_TOKEN=" + githubAccessToken,
+		Name: DockerGithubServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "docker",
+			Env: []string{
+				"GITHUB_PERSONAL_ACCESS_TOKEN=" + githubAccessToken,
+			},
+			Args: []string{
+				"run",
+				"-i",
+				"--rm",
+				"-e",
+				"GITHUB_PERSONAL_ACCESS_TOKEN",
+				"ghcr.io/github/github-mcp-server",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"run",
-			"-i",
-			"--rm",
-			"-e",
-			"GITHUB_PERSONAL_ACCESS_TOKEN",
-			"ghcr.io/github/github-mcp-server",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -85,7 +89,7 @@ func InitDockerGithubMCPClient(githubAccessToken string, protocolVersion string,
 		initRequest.Params.ClientInfo = *clientInfo
 	}
 
-	amapMCPClient.InitReq = initRequest
+	amapMCPClient.StdioClientConf.InitReq = initRequest
 
 	return amapMCPClient
 }

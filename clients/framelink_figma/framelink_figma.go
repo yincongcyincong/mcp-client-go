@@ -14,16 +14,18 @@ func InitFigmaMCPClient(figmaApiKey, protocolVersion string, clientInfo *mcp.Imp
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	figmaMCPClient := &param.MCPClientConf{
-		Name:    NpxFigmaMcpServer,
-		Command: "npx",
-		Env:     []string{},
-		Args: []string{
-			"-y",
-			"figma-developer-mcp",
-			"--figma-api-key=" + figmaApiKey,
-			"--stdio",
+		Name: NpxFigmaMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env:     []string{},
+			Args: []string{
+				"-y",
+				"figma-developer-mcp",
+				"--figma-api-key=" + figmaApiKey,
+				"--stdio",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -40,7 +42,7 @@ func InitFigmaMCPClient(figmaApiKey, protocolVersion string, clientInfo *mcp.Imp
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	figmaMCPClient.InitReq = initRequest
+	figmaMCPClient.StdioClientConf.InitReq = initRequest
 
 	return figmaMCPClient
 }

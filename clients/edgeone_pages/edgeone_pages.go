@@ -14,13 +14,15 @@ func InitEdgeoneMCPClient(protocolVersion string, clientInfo *mcp.Implementation
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	edgeoneMCPClient := &param.MCPClientConf{
-		Name:    NpxEdgeoneMcpServer,
-		Command: "npx",
-		Env:     []string{},
-		Args: []string{
-			"edgeone-pages-mcp",
+		Name: NpxEdgeoneMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env:     []string{},
+			Args: []string{
+				"edgeone-pages-mcp",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -37,7 +39,7 @@ func InitEdgeoneMCPClient(protocolVersion string, clientInfo *mcp.Implementation
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	edgeoneMCPClient.InitReq = initRequest
+	edgeoneMCPClient.StdioClientConf.InitReq = initRequest
 
 	return edgeoneMCPClient
 }

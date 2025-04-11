@@ -14,16 +14,18 @@ func InitAmapMCPClient(AgentQLApiKey string, protocolVersion string, clientInfo 
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	agentQLMCPClient := &param.MCPClientConf{
-		Name:    NpxAgentQLMcpServer,
-		Command: "npx",
-		Env: []string{
-			"AGENTQL_API_KEY=" + AgentQLApiKey,
+		Name: NpxAgentQLMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"AGENTQL_API_KEY=" + AgentQLApiKey,
+			},
+			Args: []string{
+				"-y",
+				"agentql-mcp",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"agentql-mcp",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -40,7 +42,7 @@ func InitAmapMCPClient(AgentQLApiKey string, protocolVersion string, clientInfo 
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	agentQLMCPClient.InitReq = initRequest
+	agentQLMCPClient.StdioClientConf.InitReq = initRequest
 
 	return agentQLMCPClient
 }

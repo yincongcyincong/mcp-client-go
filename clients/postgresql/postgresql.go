@@ -15,15 +15,17 @@ func InitPostgresqlMCPClient(postgresqlLink, protocolVersion string, clientInfo 
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	postgresqlMCPClient := &param.MCPClientConf{
-		Name:    NpxPostgresqlMcpServer,
-		Command: "npx",
-		Env:     []string{},
-		Args: []string{
-			"-y",
-			"@modelcontextprotocol/server-postgres",
-			postgresqlLink,
+		Name: NpxPostgresqlMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env:     []string{},
+			Args: []string{
+				"-y",
+				"@modelcontextprotocol/server-postgres",
+				postgresqlLink,
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -40,7 +42,7 @@ func InitPostgresqlMCPClient(postgresqlLink, protocolVersion string, clientInfo 
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	postgresqlMCPClient.InitReq = initRequest
+	postgresqlMCPClient.StdioClientConf.InitReq = initRequest
 
 	return postgresqlMCPClient
 }
@@ -50,17 +52,19 @@ func InitDockerPostgresqlMCPClient(postgresqlLink, protocolVersion string, clien
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	postgresqlMCPClient := &param.MCPClientConf{
-		Name:    DockerPostgresqlMcpServer,
-		Command: "docker",
-		Env:     []string{},
-		Args: []string{
-			"run",
-			"-i",
-			"--rm",
-			"mcp/postgres",
-			postgresqlLink,
+		Name: DockerPostgresqlMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "docker",
+			Env:     []string{},
+			Args: []string{
+				"run",
+				"-i",
+				"--rm",
+				"mcp/postgres",
+				postgresqlLink,
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -77,7 +81,7 @@ func InitDockerPostgresqlMCPClient(postgresqlLink, protocolVersion string, clien
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	postgresqlMCPClient.InitReq = initRequest
+	postgresqlMCPClient.StdioClientConf.InitReq = initRequest
 
 	return postgresqlMCPClient
 }

@@ -19,9 +19,9 @@ func main() {
 	amapApiKey := "29572e42530ac949d37a7d00e5d51f4a"
 	mcpParams = append(mcpParams,
 		amap.InitAmapMCPClient(amapApiKey, "", nil, nil, nil))
-	err := clients.RegisterMCPClient(context.Background(), mcpParams)
-	if err != nil {
-		log.Fatal("init amap fail", err)
+	errs := clients.RegisterMCPClient(context.Background(), mcpParams)
+	if len(errs) > 0 {
+		log.Fatal("init amap fail", errs)
 	}
 
 	mc, err := clients.GetMCPClient(amap.NpxAmapMapsMcpServer)

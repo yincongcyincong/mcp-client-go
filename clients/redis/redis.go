@@ -10,19 +10,22 @@ const (
 	DockerRedisMcpServer = "docker-redis-mcp-server"
 )
 
-func InitRedisMCPClient(protocolVersion string, clientInfo *mcp.Implementation,
+func InitRedisMCPClient(redisPath, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	redisMCPClient := &param.MCPClientConf{
-		Name:    NpxRedisMcpServer,
-		Command: "npx",
-		Args: []string{
-			"-y",
-			"@modelcontextprotocol/server-redis",
-			"redis://localhost:6379",
+		Name: NpxRedisMcpServer,
+
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Args: []string{
+				"-y",
+				"@modelcontextprotocol/server-redis",
+				redisPath,
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -39,26 +42,28 @@ func InitRedisMCPClient(protocolVersion string, clientInfo *mcp.Implementation,
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	redisMCPClient.InitReq = initRequest
+	redisMCPClient.StdioClientConf.InitReq = initRequest
 
 	return redisMCPClient
 }
 
-func InitDockerRedisMCPClient(RedisApiKey string, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerRedisMCPClient(redisPath string, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	redisMCPClient := &param.MCPClientConf{
-		Name:    DockerRedisMcpServer,
-		Command: "docker",
-		Args: []string{
-			"run",
-			"-i",
-			"--rm",
-			"mcp/redis",
-			"redis://host.docker.internal:6379",
+		Name: DockerRedisMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "docker",
+			Args: []string{
+				"run",
+				"-i",
+				"--rm",
+				"mcp/redis",
+				redisPath,
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -75,7 +80,7 @@ func InitDockerRedisMCPClient(RedisApiKey string, protocolVersion string, client
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	redisMCPClient.InitReq = initRequest
+	redisMCPClient.StdioClientConf.InitReq = initRequest
 
 	return redisMCPClient
 }

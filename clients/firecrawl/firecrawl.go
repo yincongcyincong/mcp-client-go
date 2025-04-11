@@ -14,16 +14,18 @@ func InitFirecrawlMCPClient(filecrawlApiKey, protocolVersion string, clientInfo 
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	firecrawlMCPClient := &param.MCPClientConf{
-		Name:    NpxFirecrawlMcpServer,
-		Command: "npx",
-		Env: []string{
-			"FIRECRAWL_API_KEY=" + filecrawlApiKey,
+		Name: NpxFirecrawlMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"FIRECRAWL_API_KEY=" + filecrawlApiKey,
+			},
+			Args: []string{
+				"-y",
+				"firecrawl-mcp",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"firecrawl-mcp",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -40,7 +42,7 @@ func InitFirecrawlMCPClient(filecrawlApiKey, protocolVersion string, clientInfo 
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	firecrawlMCPClient.InitReq = initRequest
+	firecrawlMCPClient.StdioClientConf.InitReq = initRequest
 
 	return firecrawlMCPClient
 }

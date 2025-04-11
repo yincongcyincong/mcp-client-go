@@ -14,16 +14,18 @@ func InitAmapMCPClient(AmapApiKey string, protocolVersion string, clientInfo *mc
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	amapMCPClient := &param.MCPClientConf{
-		Name:    NpxAmapMapsMcpServer,
-		Command: "npx",
-		Env: []string{
-			"AMAP_MAPS_API_KEY=" + AmapApiKey,
+		Name: NpxAmapMapsMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"AMAP_MAPS_API_KEY=" + AmapApiKey,
+			},
+			Args: []string{
+				"-y",
+				"@amap/amap-maps-mcp-server",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"@amap/amap-maps-mcp-server",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -40,7 +42,7 @@ func InitAmapMCPClient(AmapApiKey string, protocolVersion string, clientInfo *mc
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	amapMCPClient.InitReq = initRequest
+	amapMCPClient.StdioClientConf.InitReq = initRequest
 
 	return amapMCPClient
 }

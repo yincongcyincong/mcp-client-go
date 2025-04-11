@@ -14,16 +14,18 @@ func InitBaidumapMCPClient(BaidumapApiKey string, protocolVersion string, client
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	baidumapMCPClient := &param.MCPClientConf{
-		Name:    NpxBaidumapMcpServer,
-		Command: "npx",
-		Env: []string{
-			"BAIDU_MAP_API_KEY=" + BaidumapApiKey,
+		Name: NpxBaidumapMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"BAIDU_MAP_API_KEY=" + BaidumapApiKey,
+			},
+			Args: []string{
+				"-y",
+				"@baidumap/mcp-server-baidu-map",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"@baidumap/mcp-server-baidu-map",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -40,7 +42,7 @@ func InitBaidumapMCPClient(BaidumapApiKey string, protocolVersion string, client
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	baidumapMCPClient.InitReq = initRequest
+	baidumapMCPClient.StdioClientConf.InitReq = initRequest
 
 	return baidumapMCPClient
 }

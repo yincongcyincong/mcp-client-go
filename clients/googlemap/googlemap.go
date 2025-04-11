@@ -15,16 +15,18 @@ func InitGooglemapMCPClient(googlemapApiKey, protocolVersion string, clientInfo 
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	googlemapMCPClient := &param.MCPClientConf{
-		Name:    NpxGooglemapMcpServer,
-		Command: "npx",
-		Env: []string{
-			"GOOGLE_MAPS_API_KEY=" + googlemapApiKey,
+		Name: NpxGooglemapMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "npx",
+			Env: []string{
+				"GOOGLE_MAPS_API_KEY=" + googlemapApiKey,
+			},
+			Args: []string{
+				"-y",
+				"@modelcontextprotocol/server-google-maps",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"-y",
-			"@modelcontextprotocol/server-google-maps",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -41,7 +43,7 @@ func InitGooglemapMCPClient(googlemapApiKey, protocolVersion string, clientInfo 
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	googlemapMCPClient.InitReq = initRequest
+	googlemapMCPClient.StdioClientConf.InitReq = initRequest
 
 	return googlemapMCPClient
 }
@@ -51,20 +53,22 @@ func InitDockerGooglemapMCPClient(googlemapApiKey, protocolVersion string, clien
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
 	googlemapMCPClient := &param.MCPClientConf{
-		Name:    DockerGooglemapMcpServer,
-		Command: "docker",
-		Env: []string{
-			"GOOGLE_MAPS_API_KEY=" + googlemapApiKey,
+		Name: DockerGooglemapMcpServer,
+		StdioClientConf: &param.StdioClientConfig{
+			Command: "docker",
+			Env: []string{
+				"GOOGLE_MAPS_API_KEY=" + googlemapApiKey,
+			},
+			Args: []string{
+				"run",
+				"-i",
+				"--rm",
+				"-e",
+				"GOOGLE_MAPS_API_KEY",
+				"mcp/google-maps",
+			},
+			InitReq: mcp.InitializeRequest{},
 		},
-		Args: []string{
-			"run",
-			"-i",
-			"--rm",
-			"-e",
-			"GOOGLE_MAPS_API_KEY",
-			"mcp/google-maps",
-		},
-		InitReq:         mcp.InitializeRequest{},
 		ToolsBeforeFunc: toolsBeforeFunc,
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
@@ -81,7 +85,7 @@ func InitDockerGooglemapMCPClient(googlemapApiKey, protocolVersion string, clien
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	googlemapMCPClient.InitReq = initRequest
+	googlemapMCPClient.StdioClientConf.InitReq = initRequest
 
 	return googlemapMCPClient
 }
