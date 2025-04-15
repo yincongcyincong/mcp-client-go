@@ -12,9 +12,8 @@ import (
 )
 
 func main() {
-	// todo modify token
 	mc := postgresql.InitPostgresqlMCPClient(&postgresql.PostgreSQLParam{
-		PostgresqlLink: "xxx",
+		PostgresqlLink: "postgres://postgres:password@localhost:5432/mydatabase",
 	}, "", nil, nil, nil)
 
 	// Create context with timeout
@@ -36,7 +35,9 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "list_commits", map[string]interface{}{})
+	data, err := c.ExecTools(ctx, "query", map[string]interface{}{
+		"sql": "select 1;",
+	})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)
 	}

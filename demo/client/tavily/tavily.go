@@ -1,4 +1,4 @@
-package tavily
+package main
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 func main() {
 	// todo modify token
 	mc := tavily.InitTavilyMCPClient(&tavily.TavilyParam{
-		TavilyApiKey: "xxx",
+		TavilyApiKey: "tvly-dev-xxxx",
 	}, "", nil, nil, nil)
 
 	// Create context with timeout
@@ -36,7 +36,11 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "list_commits", map[string]interface{}{})
+	data, err := c.ExecTools(ctx, "tavily-extract", map[string]interface{}{
+		"urls":           []string{"https://www.baidu.com"},
+		"extract_depth":  "basic",
+		"include_images": false,
+	})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)
 	}
