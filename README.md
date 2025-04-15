@@ -82,13 +82,13 @@ conf := clients.InitSSEMCPClient("npx-amap-maps-mcp-server", "http://127.0.0.1",
 ### Register MCP Clients
 
 ```go
-clients.RegisterMCPClient(ctx, []*param.MCPClientConf{conf})
+clients.RegisterMCPClient(context.Background(), []*param.MCPClientConf{conf})
 ```
 
 ### Get MCP Client
 
 ```go
-client, err := clients.GetMCPClient(amap.NpxAmapMapsMcpServer)
+client, err := clients.GetMCPClient("npx-amap-maps-mcp-server")
 /
 client, err := clients.GetMCPClientByToolName("geo_location")
 ```
