@@ -12,10 +12,8 @@ import (
 )
 
 func main() {
-	mc := aws.InitAwsMCPClient(&aws.AwsParams{
-		AwsAccessKey: "xxx",
-		AwsSecretKey: "xxxx",
-		AwsRegion:    "us-east-1",
+	mc := aws.InitAwsDocumentationMCPClient(&aws.AwsDocumentationParams{
+		FastMCPLogLevel: "ERROR",
 	}, "", nil, nil, nil)
 
 	// Create context with timeout
@@ -27,7 +25,7 @@ func main() {
 		log.Fatal("InitMCPClient failed:", errs)
 	}
 
-	c, err := clients.GetMCPClient(aws.NpxAwsMcpServer)
+	c, err := clients.GetMCPClient(aws.NpxAwsDocumentServer)
 	if err != nil {
 		log.Fatal("GetMCPClient failed:", err)
 	}
@@ -37,10 +35,9 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "retrieve_from_aws_kb", map[string]interface{}{
-		"query":           "xxx",
-		"knowledgeBaseId": "xxx",
-		"n":               3,
+	data, err := c.ExecTools(ctx, "search_documentation", map[string]interface{}{
+		"search_phrase": "aws",
+		"limit":         10,
 	})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)
