@@ -12,6 +12,13 @@ import (
 )
 
 func main() {
+	StdioClient()
+
+	SSEClient()
+
+}
+
+func StdioClient() {
 	conf := clients.InitStdioMCPClient("npx-amap-maps-mcp-server", "npx", []string{
 		"AMAP_MAPS_API_KEY=" + "xxx",
 	}, []string{
@@ -49,5 +56,36 @@ func main() {
 	}
 
 	fmt.Println(data)
+}
 
+func SSEClient() {
+	// execute npx @playwright/mcp@latest --port 8931
+	mc := clients.InitSSEMCPClient("playwright", "http://localhost:8931/sse", nil, nil, nil)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	errs := clients.RegisterMCPClient(ctx, []*param.MCPClientConf{mc})
+	if len(errs) > 0 {
+		log.Fatal("InitMCPClient failed:", errs)
+	}
+
+	c, err := clients.GetMCPClient("playwright")
+	if err != nil {
+		log.Fatal("GetMCPClient failed:", err)
+	}
+
+	for _, tool := range c.Tools {
+		toolByte, _ := json.Marshal(tool)
+		fmt.Println(string(toolByte))
+	}
+
+	data, err := c.ExecTools(ctx, "browser_navigate", map[string]interface{}{
+		"url": "http://localhost:8931/sse",
+	})
+	if err != nil {
+		log.Fatal("ExecTools failed:", err)
+	}
+
+	fmt.Println(data)
 }
