@@ -1,4 +1,4 @@
-package playwright
+package atlassian
 
 import (
 	"github.com/mark3labs/mcp-go/client"
@@ -7,26 +7,38 @@ import (
 )
 
 const (
-	NpxPlaywrightMcpServer = "npx-playwright-mcp-server"
-	SsePlaywrightMcpServer = "sse-playwright-mcp-server"
+	UvxAtlassianMcpServer = "npx-atlassian-mcp-server"
+	SseAtlassianMcpServer = "sse-atlassian-mcp-server"
 )
 
-type PlaywrightParam struct {
-	Args []string
+type AtlassianParam struct {
+	ConfluenceUrl      string
+	ConfluenceUsername string
+	ConfluenceApiToken string
+	JiraUrl            string
+	JiraUsername       string
+	JiraApiToken       string
 }
 
-func InitPlaywrightMCPClient(p *PlaywrightParam, protocolVersion string, clientInfo *mcp.Implementation,
+func InitAtlassianMCPClient(p *AtlassianParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
-	playwrightMCPClient := &param.MCPClientConf{
-		Name:       NpxPlaywrightMcpServer,
+	atlassianMCPClient := &param.MCPClientConf{
+		Name:       UvxAtlassianMcpServer,
 		ClientType: param.StdioType,
 		StdioClientConf: &param.StdioClientConfig{
-			Command: "npx",
+			Command: "uvx",
+			Env: []string{
+				"CONFLUENCE_URL=" + p.ConfluenceUrl,
+				"CONFLUENCE_USERNAME=" + p.ConfluenceUsername,
+				"CONFLUENCE_API_TOKEN=" + p.ConfluenceApiToken,
+				"JIRA_URL=" + p.JiraUrl,
+				"JIRA_USERNAME=" + p.JiraUsername,
+				"JIRA_API_TOKEN=" + p.JiraApiToken,
+			},
 			Args: []string{
-				"-y",
-				"@playwright/mcp@latest",
+				"mcp-atlassian",
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
@@ -34,32 +46,30 @@ func InitPlaywrightMCPClient(p *PlaywrightParam, protocolVersion string, clientI
 		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	playwrightMCPClient.StdioClientConf.Args = append(playwrightMCPClient.StdioClientConf.Args, p.Args...)
-
 	initRequest := mcp.InitializeRequest{}
 	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	if protocolVersion != "" {
 		initRequest.Params.ProtocolVersion = protocolVersion
 	}
 	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/playwright",
+		Name:    "mcp-server/atlassian",
 		Version: "0.1.0",
 	}
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	playwrightMCPClient.StdioClientConf.InitReq = initRequest
+	atlassianMCPClient.StdioClientConf.InitReq = initRequest
 
-	return playwrightMCPClient
+	return atlassianMCPClient
 }
 
-func InitPlaywrightSSEMCPClient(baseUrl string, options []client.ClientOption,
+func InitAtlassianSSEMCPClient(baseUrl string, options []client.ClientOption,
 	protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
-	playwrightMCPClient := &param.MCPClientConf{
-		Name:       SsePlaywrightMcpServer,
+	atlassianMCPClient := &param.MCPClientConf{
+		Name:       SseAtlassianMcpServer,
 		ClientType: param.SSEType,
 		SSEClientConf: &param.SSEClientConfig{
 			BaseUrl: baseUrl,
@@ -75,13 +85,13 @@ func InitPlaywrightSSEMCPClient(baseUrl string, options []client.ClientOption,
 		initRequest.Params.ProtocolVersion = protocolVersion
 	}
 	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/playwright",
+		Name:    "mcp-server/atlassian",
 		Version: "0.1.0",
 	}
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	playwrightMCPClient.SSEClientConf.InitReq = initRequest
+	atlassianMCPClient.SSEClientConf.InitReq = initRequest
 
-	return playwrightMCPClient
+	return atlassianMCPClient
 }

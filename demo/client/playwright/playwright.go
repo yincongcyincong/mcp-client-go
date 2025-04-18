@@ -24,7 +24,7 @@ func main() {
 		log.Fatal("InitMCPClient failed:", errs)
 	}
 
-	c, err := clients.GetMCPClient(playwright.NpxPlaywrightMcpServer)
+	c, err := clients.GetMCPClient(playwright.SsePlaywrightMcpServer)
 	if err != nil {
 		log.Fatal("GetMCPClient failed:", err)
 	}
