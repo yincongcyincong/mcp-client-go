@@ -1,7 +1,6 @@
 package cloudflare
 
 import (
-	"fmt"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 )
@@ -22,10 +21,10 @@ func InitCloudflareMCPClient(p *CloudflareParam, protocolVersion string, clientI
 		ClientType: param.StdioType,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
-			Env: []string{},
+			Env:     []string{},
 			Args: []string{
 				"mcp-remote",
-				"https://observability.mcp.cloudflare.com/sse"
+				"https://observability.mcp.cloudflare.com/sse",
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
