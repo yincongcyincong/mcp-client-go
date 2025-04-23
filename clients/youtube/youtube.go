@@ -1,4 +1,4 @@
-package binance
+package youtube
 
 import (
 	"github.com/mark3labs/mcp-go/mcp"
@@ -6,27 +6,27 @@ import (
 )
 
 const (
-	NpxBinanceMcpServer = "npx-binance-mcp-server"
+	NpxYoutubeMcpServer = "npx-youtube-mcp-server"
 )
 
-type BinanceParam struct {
-	BinanceApiKey string
+type YoutubeParam struct {
+	YoutubeApiKey string
 }
 
-func InitBinanceMCPClient(p *BinanceParam, protocolVersion string, clientInfo *mcp.Implementation,
+func InitYoutubeMCPClient(p *YoutubeParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
-	binanceMCPClient := &param.MCPClientConf{
-		Name: NpxBinanceMcpServer,
+	YoutubeMCPClient := &param.MCPClientConf{
+		Name: NpxYoutubeMcpServer,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"BINANCE_API_KEY=" + p.BinanceApiKey,
+				"YOUTUBE_API_KEY=" + p.YoutubeApiKey,
 			},
 			Args: []string{
 				"-y",
-				"@snjyor/binance-mcp@latest",
+				"@modelcontextprotocol/server-youtube",
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
@@ -40,13 +40,13 @@ func InitBinanceMCPClient(p *BinanceParam, protocolVersion string, clientInfo *m
 		initRequest.Params.ProtocolVersion = protocolVersion
 	}
 	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/binance",
+		Name:    "mcp-server/youtube",
 		Version: "0.1.0",
 	}
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	binanceMCPClient.StdioClientConf.InitReq = initRequest
+	YoutubeMCPClient.StdioClientConf.InitReq = initRequest
 
-	return binanceMCPClient
+	return YoutubeMCPClient
 }

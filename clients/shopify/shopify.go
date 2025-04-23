@@ -1,4 +1,4 @@
-package binance
+package shopify
 
 import (
 	"github.com/mark3labs/mcp-go/mcp"
@@ -6,27 +6,23 @@ import (
 )
 
 const (
-	NpxBinanceMcpServer = "npx-binance-mcp-server"
+	NpxShopifyMcpServer = "npx-shopify-mcp-server"
 )
 
-type BinanceParam struct {
-	BinanceApiKey string
-}
+type ShopifyParam struct{}
 
-func InitBinanceMCPClient(p *BinanceParam, protocolVersion string, clientInfo *mcp.Implementation,
+func InitShopifyMCPClient(p *ShopifyParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
-	binanceMCPClient := &param.MCPClientConf{
-		Name: NpxBinanceMcpServer,
+	ShopifyMCPClient := &param.MCPClientConf{
+		Name: NpxShopifyMcpServer,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
-			Env: []string{
-				"BINANCE_API_KEY=" + p.BinanceApiKey,
-			},
+			Env:     []string{},
 			Args: []string{
 				"-y",
-				"@snjyor/binance-mcp@latest",
+				"@shopify/dev-mcp@latest",
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
@@ -40,13 +36,13 @@ func InitBinanceMCPClient(p *BinanceParam, protocolVersion string, clientInfo *m
 		initRequest.Params.ProtocolVersion = protocolVersion
 	}
 	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/binance",
+		Name:    "mcp-server/shopify",
 		Version: "0.1.0",
 	}
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	binanceMCPClient.StdioClientConf.InitReq = initRequest
+	ShopifyMCPClient.StdioClientConf.InitReq = initRequest
 
-	return binanceMCPClient
+	return ShopifyMCPClient
 }

@@ -16,7 +16,7 @@ and interact with various MCP-based services such as Amap (Gaode Maps) using a u
 
 ## 📋 Supported Services
 
-| MCP Server           | 	Description                                                                                                                                                                                                  | doc                                                                                     | demo                                                                                                                         |                                                                                            
+| MCP Server           | 	Description                                                                                                                                                                                                  | doc                                                                                     | demo                                                                                                                         |
 |----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
 | redis	               | A Model Context Protocol server that provides access to Redis databases.                                                                                                                                      | [doc](https://github.com/modelcontextprotocol/servers/tree/main/src/redis)              | [redis](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/redis/redis.go)                               |
 | github	              | The GitHub MCP Server is a Model Context Protocol (MCP) server that provides seamless integration with GitHub APIs                                                                                            | [doc](https://github.com/github/github-mcp-server)                                      | [github](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/github/github.go)                            |
@@ -46,6 +46,9 @@ and interact with various MCP-based services such as Amap (Gaode Maps) using a u
 | notion	              | MCP server for the Notion API.                                                                                                                                                                                | [doc](https://github.com/makenotion/notion-mcp-server)                                  |                                                                                                                              |
 | cloudflare	          | MCP Server for Cloudflare's API.                                                                                                                                                                              | [doc](https://github.com/cloudflare/mcp-server-cloudflare)                              |                                                                                                                              |
 | binance	             | MCP Server for Binance's API.                                                                                                                                                                                 | [doc](https://github.com/snjyor/binance-mcp)                              |                                                                                                                              |
+| youtube	             | MCP Server for Youtube's API.                                                                                                                                                                                 | [doc](https://github.com/ZubeidHendricks/youtube-mcp-server)                              |                                                                                                                              |
+| shopify	             | MCP Server for Shopify's API.                                                                                                                                                                                 | [doc](https://github.com/Shopify/dev-mcp)                              |                                                                                                                              |
+
 
 ## 🚀 Getting Started
 
@@ -61,9 +64,9 @@ go get github.com/yincongcyincong/mcp-client-go
 
 ## 🧪 Example
 
-[client demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/client)    
-[app demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)     
-[deepseek demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/deepseek/deepseek.go)       
+[client demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/client)
+[app demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)
+[deepseek demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/deepseek/deepseek.go)
 [openai demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/openai/openai.go)
 
 ---

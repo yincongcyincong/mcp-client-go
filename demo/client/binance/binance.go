@@ -12,7 +12,9 @@ import (
 )
 
 func main() {
-	mc := binance.InitBinanceMCPClient(&binance.BinanceParam{}, "", nil, nil, nil)
+	mc := binance.InitBinanceMCPClient(&binance.BinanceParam{
+		BinanceApiKey: "",
+	}, "", nil, nil, nil)
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
