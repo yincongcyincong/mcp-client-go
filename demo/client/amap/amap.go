@@ -18,7 +18,7 @@ func main() {
 	}, "", nil, nil, nil)
 
 	// Create context with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
 
 	errs := clients.RegisterMCPClient(ctx, []*param.MCPClientConf{mc})

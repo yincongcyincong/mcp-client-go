@@ -5,16 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/yincongcyincong/mcp-client-go/clients"
-	"github.com/yincongcyincong/mcp-client-go/clients/aws"
+	"github.com/yincongcyincong/mcp-client-go/clients/bilibili"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"log"
 	"time"
 )
 
 func main() {
-	mc := aws.InitAwsDocumentationMCPClient(&aws.AwsDocumentationParams{
-		FastMCPLogLevel: "ERROR",
-	}, "", nil, nil, nil)
+	mc := bilibili.InitBilibiliMCPClient(&bilibili.BilibiliParam{}, "", nil, nil, nil)
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
@@ -25,7 +23,7 @@ func main() {
 		log.Fatal("InitMCPClient failed:", errs)
 	}
 
-	c, err := clients.GetMCPClient(aws.NpxAwsDocumentServer)
+	c, err := clients.GetMCPClient(bilibili.NpxBilibiliMcpServer)
 	if err != nil {
 		log.Fatal("GetMCPClient failed:", err)
 	}
@@ -35,14 +33,12 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "search_documentation", map[string]interface{}{
-		"search_phrase": "aws",
-		"limit":         10,
+	data, err := c.ExecTools(ctx, "bilibili-search", map[string]interface{}{
+		"keyword": "mcp",
 	})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)
 	}
 
 	fmt.Println(data)
-
 }

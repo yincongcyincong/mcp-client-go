@@ -5,15 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/yincongcyincong/mcp-client-go/clients"
-	"github.com/yincongcyincong/mcp-client-go/clients/aws"
+	"github.com/yincongcyincong/mcp-client-go/clients/aliyun"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"log"
 	"time"
 )
 
 func main() {
-	mc := aws.InitAwsDocumentationMCPClient(&aws.AwsDocumentationParams{
-		FastMCPLogLevel: "ERROR",
+	mc := aliyun.InitAliyunMCPClient(&aliyun.AliyunParams{
+		AliyunAccessKeyID:     "xxx",
+		AliyunAccessKeySecret: "xxx",
 	}, "", nil, nil, nil)
 
 	// Create context with timeout
@@ -25,7 +26,7 @@ func main() {
 		log.Fatal("InitMCPClient failed:", errs)
 	}
 
-	c, err := clients.GetMCPClient(aws.NpxAwsDocumentServer)
+	c, err := clients.GetMCPClient(aliyun.UvxAliyunMcpServer)
 	if err != nil {
 		log.Fatal("GetMCPClient failed:", err)
 	}
@@ -35,14 +36,12 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "search_documentation", map[string]interface{}{
-		"search_phrase": "aws",
-		"limit":         10,
+	data, err := c.ExecTools(ctx, "DescribeAccountAttributes", map[string]interface{}{
+		"RegionId": "cn-hangzhou",
 	})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)
 	}
 
 	fmt.Println(data)
-
 }
