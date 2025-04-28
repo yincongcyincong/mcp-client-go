@@ -5,16 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/yincongcyincong/mcp-client-go/clients"
-	"github.com/yincongcyincong/mcp-client-go/clients/binance"
+	"github.com/yincongcyincong/mcp-client-go/clients/bitcoin"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"log"
 	"time"
 )
 
 func main() {
-	mc := binance.InitBinanceMCPClient(&binance.BinanceParam{
-		BinanceApiKey: "",
-	}, "", nil, nil, nil)
+	mc := bitcoin.InitBitcoinMCPClient(&bitcoin.BitcoinParam{}, "", nil, nil, nil)
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
@@ -25,7 +23,7 @@ func main() {
 		log.Fatal("InitMCPClient failed:", errs)
 	}
 
-	c, err := clients.GetMCPClient(binance.NpxBinanceMcpServer)
+	c, err := clients.GetMCPClient(bitcoin.NpxBitcoinMcpServer)
 	if err != nil {
 		log.Fatal("GetMCPClient failed:", err)
 	}
@@ -35,9 +33,7 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "get_price", map[string]interface{}{
-		"symbols": []string{"BTCUSDT"},
-	})
+	data, err := c.ExecTools(ctx, "get_latest_block", map[string]interface{}{})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)
 	}
