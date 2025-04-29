@@ -1,4 +1,4 @@
-package twitter
+package leetcode
 
 import (
 	"github.com/mark3labs/mcp-go/mcp"
@@ -6,33 +6,28 @@ import (
 )
 
 const (
-	NpxTwitterMcpServer = "npx-twitter-mcp-server"
+	NpxLeetcodeMcpServer = "npx-leetcode-mcp-server"
 )
 
-type TwitterParam struct {
-	ApiKey            string
-	ApiSecretKey      string
-	AccessToken       string
-	AccessTokenSecret string
+type LeetcodeParam struct {
+	LeetcodeSession string
 }
 
-func InitTwitterMCPClient(p *TwitterParam, protocolVersion string, clientInfo *mcp.Implementation,
+func InitLeetcodeMCPClient(p *LeetcodeParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
-	twitterMCPClient := &param.MCPClientConf{
-		Name: NpxTwitterMcpServer,
+	leetcodeMCPClient := &param.MCPClientConf{
+		Name: NpxLeetcodeMcpServer,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
 			Env: []string{
-				"API_KEY=" + p.ApiKey,
-				"API_SECRET_KEY=" + p.ApiSecretKey,
-				"ACCESS_TOKEN=" + p.AccessToken,
-				"ACCESS_TOKEN_SECRET=" + p.AccessTokenSecret,
+				"LEETCODE_SITE=global",
+				"LEETCODE_SESSION=" + p.LeetcodeSession,
 			},
 			Args: []string{
 				"-y",
-				"@enescinar/twitter-mcp",
+				"@jinzcdev/leetcode-mcp-server",
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
@@ -46,13 +41,13 @@ func InitTwitterMCPClient(p *TwitterParam, protocolVersion string, clientInfo *m
 		initRequest.Params.ProtocolVersion = protocolVersion
 	}
 	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/twitter",
+		Name:    "mcp-server/leetcode",
 		Version: "0.1.0",
 	}
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	twitterMCPClient.StdioClientConf.InitReq = initRequest
+	leetcodeMCPClient.StdioClientConf.InitReq = initRequest
 
-	return twitterMCPClient
+	return leetcodeMCPClient
 }

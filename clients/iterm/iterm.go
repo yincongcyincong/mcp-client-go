@@ -1,4 +1,4 @@
-package twitter
+package iterm
 
 import (
 	"github.com/mark3labs/mcp-go/mcp"
@@ -6,33 +6,24 @@ import (
 )
 
 const (
-	NpxTwitterMcpServer = "npx-twitter-mcp-server"
+	NpxItermMcpServer = "npx-iterm-mcp-server"
 )
 
-type TwitterParam struct {
-	ApiKey            string
-	ApiSecretKey      string
-	AccessToken       string
-	AccessTokenSecret string
+type ItermParam struct {
 }
 
-func InitTwitterMCPClient(p *TwitterParam, protocolVersion string, clientInfo *mcp.Implementation,
+func InitItermMCPClient(p *ItermParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
-	twitterMCPClient := &param.MCPClientConf{
-		Name: NpxTwitterMcpServer,
+	itermMCPClient := &param.MCPClientConf{
+		Name: NpxItermMcpServer,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
-			Env: []string{
-				"API_KEY=" + p.ApiKey,
-				"API_SECRET_KEY=" + p.ApiSecretKey,
-				"ACCESS_TOKEN=" + p.AccessToken,
-				"ACCESS_TOKEN_SECRET=" + p.AccessTokenSecret,
-			},
+			Env:     []string{},
 			Args: []string{
 				"-y",
-				"@enescinar/twitter-mcp",
+				"iterm-mcp",
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
@@ -46,13 +37,13 @@ func InitTwitterMCPClient(p *TwitterParam, protocolVersion string, clientInfo *m
 		initRequest.Params.ProtocolVersion = protocolVersion
 	}
 	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/twitter",
+		Name:    "mcp-server/iterm",
 		Version: "0.1.0",
 	}
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	twitterMCPClient.StdioClientConf.InitReq = initRequest
+	itermMCPClient.StdioClientConf.InitReq = initRequest
 
-	return twitterMCPClient
+	return itermMCPClient
 }

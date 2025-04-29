@@ -1,4 +1,4 @@
-package twitter
+package telegram
 
 import (
 	"github.com/mark3labs/mcp-go/mcp"
@@ -6,33 +6,34 @@ import (
 )
 
 const (
-	NpxTwitterMcpServer = "npx-twitter-mcp-server"
+	DockerTelegramMcpServer = "docker-telegram-mcp-server"
 )
 
-type TwitterParam struct {
-	ApiKey            string
-	ApiSecretKey      string
-	AccessToken       string
-	AccessTokenSecret string
+type TelegramParam struct {
+	TelegramApiId         string
+	TelegramApiHash       string
+	TelegramSessionString string
 }
 
-func InitTwitterMCPClient(p *TwitterParam, protocolVersion string, clientInfo *mcp.Implementation,
+func InitDockerTelegramMCPClient(p *TelegramParam, protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
 
-	twitterMCPClient := &param.MCPClientConf{
-		Name: NpxTwitterMcpServer,
+	telegramMCPClient := &param.MCPClientConf{
+		Name: DockerTelegramMcpServer,
 		StdioClientConf: &param.StdioClientConfig{
-			Command: "npx",
+			Command: "docker",
 			Env: []string{
-				"API_KEY=" + p.ApiKey,
-				"API_SECRET_KEY=" + p.ApiSecretKey,
-				"ACCESS_TOKEN=" + p.AccessToken,
-				"ACCESS_TOKEN_SECRET=" + p.AccessTokenSecret,
+				"TELEGRAM_API_ID=" + p.TelegramApiId,
+				"TELEGRAM_API_HASH=" + p.TelegramApiHash,
+				"TELEGRAM_SESSION_STRING=" + p.TelegramSessionString,
+				"SESSION_STRING=" + p.TelegramSessionString,
 			},
 			Args: []string{
-				"-y",
-				"@enescinar/twitter-mcp",
+				"run",
+				"-i",
+				"--rm",
+				"telegram-mcp:latest",
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
@@ -46,13 +47,13 @@ func InitTwitterMCPClient(p *TwitterParam, protocolVersion string, clientInfo *m
 		initRequest.Params.ProtocolVersion = protocolVersion
 	}
 	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/twitter",
+		Name:    "mcp-server/telegram",
 		Version: "0.1.0",
 	}
 	if clientInfo != nil {
 		initRequest.Params.ClientInfo = *clientInfo
 	}
-	twitterMCPClient.StdioClientConf.InitReq = initRequest
+	telegramMCPClient.StdioClientConf.InitReq = initRequest
 
-	return twitterMCPClient
+	return telegramMCPClient
 }
