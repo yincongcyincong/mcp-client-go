@@ -1,7 +1,7 @@
 package param
 
 import (
-	"github.com/mark3labs/mcp-go/client"
+	"github.com/mark3labs/mcp-go/client/transport"
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
@@ -28,7 +28,7 @@ type StdioClientConfig struct {
 }
 
 type SSEClientConfig struct {
-	Options []client.ClientOption
+	Options []transport.ClientOption
 	BaseUrl string
 	InitReq mcp.InitializeRequest
 }
