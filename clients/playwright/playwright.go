@@ -1,7 +1,7 @@
 package playwright
 
 import (
-	"github.com/mark3labs/mcp-go/client"
+	"github.com/mark3labs/mcp-go/client/transport"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 )
@@ -53,7 +53,7 @@ func InitPlaywrightMCPClient(p *PlaywrightParam, protocolVersion string, clientI
 	return playwrightMCPClient
 }
 
-func InitPlaywrightSSEMCPClient(baseUrl string, options []client.ClientOption,
+func InitPlaywrightSSEMCPClient(baseUrl string, options []transport.ClientOption,
 	protocolVersion string, clientInfo *mcp.Implementation,
 	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
 	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
