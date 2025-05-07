@@ -1,95 +1,81 @@
-1. **List all available label names in a Loki datasource for the given time range:**
+1. `add_activity_to_incident`
+    - "Add a note to incident ID `abc123`: “We’ve contacted customer support.” The event time is `2025-05-06T14:00:00Z`."
 
-   - "Please list all available label names in the Loki datasource with UID `datasourceUid` for the time range starting from `startRfc3339` and ending at `endRfc3339`."
+2. `create_incident`
+    - "Create a new incident titled “Service Outage” with severity “critical” and status “active”. It’s a drill. Add labels `region:us-east-1` and `service:payment`. The room prefix is `incident-`. Attach this screenshot: `https://example.com/screenshot.png` with the caption “Error page screenshot”".
 
-2. **Retrieve all possible values for a specific label in Loki within the given time range:**
+3. `get_alert_rule_by_uid`
+    - "Show me the details of the alert rule with UID `alert-456`".
 
-   - "Retrieve all possible values for the label `labelName` in the Loki datasource with UID `datasourceUid` for the time range starting from `startRfc3339` and ending at `endRfc3339`."
+4. `get_current_oncall_users`
+    - "Who is currently on-call for the schedule ID `schedule-789`?"
 
-3. **List OnCall schedules for a specific team:**
+5. `get_dashboard_by_uid`
+    - "Retrieve the dashboard with UID `dash-001`".
 
-   - "Please list the OnCall schedules for the team with ID `teamId`, returning page `page`. If a specific schedule ID `scheduleId` is provided, return the details for that schedule."
+6. `get_datasource_by_name`
+    - "Get the datasource named `Loki-Logs`".
 
-4. **List teams from Grafana OnCall:**
+7. `get_datasource_by_uid`
+    - "I want the datasource with UID `ds-987`".
 
-   - "Please list all teams from Grafana OnCall, returning page `page`."
+8. `get_incident`
+    - "Get the full details of incident ID `incident-abc456`".
 
-5. **List users from Grafana OnCall:**
+9. `get_oncall_shift`
+    - "Show me the shift details for shift ID `shift-101`".
 
-   - "Please list all users from Grafana OnCall, returning page `page`. If a user ID `userId` or username `username` is provided, return the details for that specific user."
+10. `list_alert_rules`
+    - "List all alert rules that are currently firing and have the label `service=api`. Limit the results to 50".
 
-6. **List label names in a Prometheus datasource:**
+11. `list_contact_points`
+    - "List all notification contact points".
 
-   - "List all label names in the Prometheus datasource with UID `datasourceUid` for the time range starting from `startRfc3339` and ending at `endRfc3339`. Optionally, filter the results with `matches` and limit the results to `limit`."
+12. `list_datasources`
+    - "List all datasources of type `prometheus`".
 
-7. **Get the values of a label in Prometheus:**
+13. `list_incidents`
+    - "List all active incidents, excluding drills".
 
-   - "Retrieve the values of the label `labelName` in the Prometheus datasource with UID `datasourceUid` for the time range starting from `startRfc3339` and ending at `endRfc3339`. Optionally, filter the results with `matches` and limit the results to `limit`."
+14. `list_loki_label_names`
+    - "Show me all unique label keys from the Loki datasource with UID `loki-123` for the past 2 hours".
 
-8. **List Prometheus metric metadata:**
-
-   - "Please list the metric metadata in the Prometheus datasource with UID `datasourceUid`, with an optional limit of `limit` metrics and `limitPerMetric` metrics per metric. If a specific metric `metric` is provided, return details for that metric."
-
-9. **List metric names in a Prometheus datasource that match a given regex:**
-
-   - "List all metric names in the Prometheus datasource with UID `datasourceUid` that match the regex `regex`. Return up to `limit` results on page `page`."
-
-10. **Query and retrieve log entries or metric values from a Loki datasource:**
-
-    - "Please query the Loki datasource with UID `datasourceUid` using the LogQL query `logql` for the time range starting from `startRfc3339` and ending at `endRfc3339`. Optionally, return results in `direction` order and limit the number of log lines to `limit`."
-
-11. **Query statistics about log streams in a Loki datasource:**
-
-    - "Please query statistics about log streams in the Loki datasource with UID `datasourceUid` using the LogQL matcher `logql` for the time range starting from `startRfc3339` and ending at `endRfc3339`."
-
-12. **Query Prometheus using a range or instant request:**
-
-    - "Please query the Prometheus datasource with UID `datasourceUid` using the PromQL expression `expr`. The query type is `queryType` with a time range from `startRfc3339` to `endRfc3339`. If `queryType` is 'range', use a step size of `stepSeconds`."
-
-13. **Search for dashboards:**
-
-    - "Please search for dashboards using the query `query`."
-
-14. **Create or update a dashboard:**
-
-    - "Please create or update the dashboard with the provided JSON `dashboard`. If the dashboard is to be saved in a folder, use the folder UID `folderUid`. Set the commit message to `message` and specify whether to overwrite the dashboard with the `overwrite` flag."
-
-15. **Prompt for `add_activity_to_incident`:**
+15. `add_activity_to_incident`:
     - "Add a note to incident `incident-12345` with the content 'The body of the activity content' and event time `2025-04-27T14:00:00Z`."
 
-16. **Prompt for `create_incident`:**
+16. `create_incident`:
     - "Create a high-priority incident titled 'Critical Incident' with the severity set to 'High', status set to 'Active', and a label 'Critical'. Attach a file with URL 'https://example.com/attachment' and caption 'Attachment Caption'."
 
-17. **Prompt for `get_alert_rule_by_uid`:**
+17. `get_alert_rule_by_uid`:
     - "Retrieve details for the alert rule with UID `alert-rule-123`."
 
-18. **Prompt for `get_current_oncall_users`:**
+18. `get_current_oncall_users`:
     - "Get the current on-call users for the schedule `schedule-abc123`."
 
-19. **Prompt for `get_dashboard_by_uid`:**
+19. `get_dashboard_by_uid`:
     - "Retrieve the dashboard with UID `dashboard-xyz789`."
 
-20. **Prompt for `get_datasource_by_name`:**
+20. `get_datasource_by_name`:
     - "Get the data source details for `prometheus-datasource`."
 
-21. **Prompt for `get_datasource_by_uid`:**
+21. `get_datasource_by_uid`:
     - "Retrieve data source information for UID `datasource-uid-456`."
 
-22. **Prompt for `get_incident`:**
+22. `get_incident`:
     - "Get the details of the incident with ID `incident-12345`."
 
-23. **Prompt for `get_oncall_shift`:**
+23. `get_oncall_shift`:
     - "Get the details of the on-call shift with ID `shift-001`."
 
-24. **Prompt for `list_alert_rules`:**
+24. `list_alert_rules`:
     - "List all alert rules with severity 'critical', returning the first 50 records."
 
-25. **Prompt for `list_contact_points`:**
+25. `list_contact_points`:
     - "List all notification contact points filtered by name 'Alert Contact', returning up to 100 records."
 
-26. **Prompt for `list_datasources`:**
+26. `list_datasources`:
     - "List all data sources of type 'Prometheus'."
 
-27. **Prompt for `list_incidents`:**
+27. `list_incidents`:
     - "List all incidents with status 'active', excluding drill incidents, and return up to 100 records."
 
