@@ -34,33 +34,33 @@
 12. `GetCpuLoadavgData`:
     - Fetch the 1-minute average CPU load for ECS instances with IDs: `i-12345`, `i-67890` in the `cn-hangzhou` region.
 
-13. `Get CPU 5-minute average load data:`
+13. `GetCpuloadavg5mData`
     - Can you fetch the CPU load average for my ECS instances over the past 5 minutes?
 
-14. `Get CPU 15-minute average load data:`
+14. `GetCpuloadavg15mData`
     - "Please show the CPU load average for my ECS instances over the past 15 minutes.
 
-15. `Get memory usage data:`
+15. `GetMemUsedData`
     - Retrieve memory utilization data for the following ECS instances.
 
-16. `Get memory utilization data:`
+16. `GetMemUsageData`
     - Fetch memory utilization data across my ECS instances.
 
-17. `Get disk usage data:`
+17. `GetDiskUsageData`
     - Retrieve disk usage information for multiple ECS instances.
 
-18. `Get total disk capacity data:`
+18. `GetDiskTotalData`
     - Show me the disk total capacity for my ECS instances.
 
-19. `Get disk used data:`
+19. `GetDiskUsedData`
     - Retrieve the disk usage information for ECS instances.
 
-20. `List all OSS storage spaces in a region:`
+20. `ListBuckets`
     - Can you show the available OSS buckets in the region?
 
-21. `Get all files in a specific OSS storage space:`
+21. `ListObjects`
     - Show me the contents of the OSS bucket named 'my-bucket' in the cn-hangzhou region.
 
-22. `Create a new OSS storage space:`
+22. `PutBucket`
      - Can you set up a new OSS bucket called 'my-new-bucket' with standard storage in cn-hangzhou?
 
