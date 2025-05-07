@@ -1,5 +1,3 @@
-Sure! Here's the **English version** of the `README.md` based on your project, describing a collection of prompts that trigger function calls, organized by service:
-
 ---
 
 # 📚 Function Call Prompt Collection (for MCP Server Integration)
