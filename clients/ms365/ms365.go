@@ -21,11 +21,10 @@ func InitMS365MCPClient(p *MS365Param, protocolVersion string, clientInfo *mcp.I
 		Name: NpxMS365McpServer,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
-			Env: []string{
-			},
+			Env:     []string{},
 			Args: []string{
-                "-y",
-                "@softeria/ms-365-mcp-server"
+				"-y",
+				"@softeria/ms-365-mcp-server",
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
