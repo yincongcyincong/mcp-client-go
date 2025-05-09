@@ -78,10 +78,11 @@ go get github.com/yincongcyincong/mcp-client-go
 
 ## 🧪 Example
 
-[client demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/client)
-[app demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)
-[deepseek demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/deepseek/deepseek.go)
-[openai demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/openai/openai.go)
+[client demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/client)    
+[app demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)    
+[deepseek demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/deepseek/deepseek.go)    
+[openai demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/openai/openai.go)    
+[project](https://github.com/yincongcyincong/telegram-deepseek-bot/blob/main/conf/tools_conf.go)
 
 ---
 
