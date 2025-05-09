@@ -46,4 +46,4 @@ jobs:
                   mkdir -p ./bin
                   go build -o ./bin/amap demo/client/amap/amap.go
                   go build -o ./bin/playwright demo/client/playwright/playwright.go
-                  go build -o ./bin/time demo/client/playwright/time.go
+                  go build -o ./bin/time demo/client/time/time.go
