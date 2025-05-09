@@ -63,6 +63,8 @@ and interact with various MCP-based services such as Amap (Gaode Maps) using a u
 | k8s	                 | MCP Server for K8s's API.                                                                                                                                                                                     | [doc](https://github.com/alexei-led/k8s-mcp-server)                                     |                                                                                                                              |
 | apple-shortcut	      | MCP Server for Apple Shortcut's API.                                                                                                                                                                          | [doc](https://github.com/recursechat/mcp-server-apple-shortcuts)                        |                                                                                                                              |
 | ms-365	              | MCP Server for MS356's API.                                                                                                                                                                                   | [doc](https://github.com/softeria/ms-365-mcp-server)                                    |                                                                                                                              |
+| tinybird	            | MCP Server for TinyBird's API.                                                                                                                                                                                | [doc](https://github.com/tinybirdco/mcp-tinybird)                                       |                                                                                                                              |
+| mysql	               | MCP Server for Mysql's API.                                                                                                                                                                                   | [doc](https://github.com/benborla/mcp-server-mysql)                                     |                                                                                                                              |
 
 ## 🚀 Getting Started
 
@@ -78,10 +80,10 @@ go get github.com/yincongcyincong/mcp-client-go
 
 ## 🧪 Example
 
-[client demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/client)    
-[app demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)    
-[deepseek demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/deepseek/deepseek.go)    
-[openai demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/openai/openai.go)    
+[client demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/client)
+[app demo](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)
+[deepseek demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/deepseek/deepseek.go)
+[openai demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/openai/openai.go)
 [project](https://github.com/yincongcyincong/telegram-deepseek-bot/blob/main/conf/tools_conf.go)
 
 ---
