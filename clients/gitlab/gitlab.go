@@ -25,7 +25,7 @@ func InitGitlabMCPClient(p *GitlabParam, protocolVersion string, clientInfo *mcp
 			Command: "npx",
 			Env: []string{
 				"GITLAB_PERSONAL_ACCESS_TOKEN=" + p.GitlabApiKey,
-				"GITLAB_API_URL" + p.GitlabUrl, // Optional, for self-hosted instances
+				"GITLAB_API_URL=" + p.GitlabUrl, // Optional, for self-hosted instances
 			},
 			Args: []string{
 				"-y",
