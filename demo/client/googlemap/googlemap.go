@@ -14,7 +14,7 @@ import (
 func main() {
 	mc := googlemap.InitGooglemapMCPClient(&googlemap.GoogleMapParam{
 		GooglemapApiKey: "xxx",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)

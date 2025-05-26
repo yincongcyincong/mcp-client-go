@@ -20,9 +20,7 @@ type AwsCoreParams struct {
 	MCPSettingPath  string
 }
 
-func InitAwsCoreMCPClient(p *AwsCoreParams, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitAwsCoreMCPClient(p *AwsCoreParams, options ...param.Option) *param.MCPClientConf {
 
 	awsMCPClient := &param.MCPClientConf{
 		Name: NpxAwsCoreMcpServer,
@@ -37,23 +35,22 @@ func InitAwsCoreMCPClient(p *AwsCoreParams, protocolVersion string, clientInfo *
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(awsMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/aws-core",
-		Version: "0.1.0",
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/aws-core",
+			Version: "0.1.0",
+		}
 	}
-	awsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return awsMCPClient
 }
@@ -64,9 +61,7 @@ type AwsNovaCanvasParams struct {
 	AwsRegion       string
 }
 
-func InitAwsNovaCanvasMCPClient(p *AwsNovaCanvasParams, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitAwsNovaCanvasMCPClient(p *AwsNovaCanvasParams, options ...param.Option) *param.MCPClientConf {
 
 	awsMCPClient := &param.MCPClientConf{
 		Name: NpxAwsCanvasMcpServer,
@@ -82,23 +77,22 @@ func InitAwsNovaCanvasMCPClient(p *AwsNovaCanvasParams, protocolVersion string, 
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(awsMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/aws-nova-canvas",
-		Version: "0.1.0",
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/aws-nova-canvas",
+			Version: "0.1.0",
+		}
 	}
-	awsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return awsMCPClient
 }
@@ -109,9 +103,7 @@ type AwsBedrockKbRetrievalsParams struct {
 	AwsRegion       string
 }
 
-func InitAwsBedrockKbRetrievalMCPClient(p *AwsBedrockKbRetrievalsParams, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitAwsBedrockKbRetrievalMCPClient(p *AwsBedrockKbRetrievalsParams, options ...param.Option) *param.MCPClientConf {
 
 	awsMCPClient := &param.MCPClientConf{
 		Name: NpxAwsBedrockKbRetrievalsServer,
@@ -127,23 +119,22 @@ func InitAwsBedrockKbRetrievalMCPClient(p *AwsBedrockKbRetrievalsParams, protoco
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(awsMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/aws-bedrock-kb-retrieval",
-		Version: "0.1.0",
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/aws-bedrock-kb-retrieval",
+			Version: "0.1.0",
+		}
 	}
-	awsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return awsMCPClient
 }
@@ -153,9 +144,7 @@ type AwsAnalysisParams struct {
 	AwsProfile      string
 }
 
-func InitAwsAnalysisMCPClient(p *AwsAnalysisParams, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitAwsAnalysisMCPClient(p *AwsAnalysisParams, options ...param.Option) *param.MCPClientConf {
 
 	awsMCPClient := &param.MCPClientConf{
 		Name: NpxAwsAnalysisServer,
@@ -170,23 +159,22 @@ func InitAwsAnalysisMCPClient(p *AwsAnalysisParams, protocolVersion string, clie
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(awsMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/aws-analysis",
-		Version: "0.1.0",
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/aws-analysis",
+			Version: "0.1.0",
+		}
 	}
-	awsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return awsMCPClient
 }
@@ -195,9 +183,7 @@ type AwsCDKParams struct {
 	FastMCPLogLevel string
 }
 
-func InitAwsCDKMCPClient(p *AwsCDKParams, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitAwsCDKMCPClient(p *AwsCDKParams, options ...param.Option) *param.MCPClientConf {
 
 	awsMCPClient := &param.MCPClientConf{
 		Name: NpxAwsCDKServer,
@@ -211,23 +197,22 @@ func InitAwsCDKMCPClient(p *AwsCDKParams, protocolVersion string, clientInfo *mc
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(awsMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/aws-cdk",
-		Version: "0.1.0",
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/aws-cdk",
+			Version: "0.1.0",
+		}
 	}
-	awsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return awsMCPClient
 }
@@ -236,9 +221,7 @@ type AwsDocumentationParams struct {
 	FastMCPLogLevel string
 }
 
-func InitAwsDocumentationMCPClient(p *AwsDocumentationParams, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitAwsDocumentationMCPClient(p *AwsDocumentationParams, options ...param.Option) *param.MCPClientConf {
 
 	awsMCPClient := &param.MCPClientConf{
 		Name: NpxAwsDocumentServer,
@@ -252,23 +235,22 @@ func InitAwsDocumentationMCPClient(p *AwsDocumentationParams, protocolVersion st
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(awsMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/aws-documentation",
-		Version: "0.1.0",
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/aws-documentation",
+			Version: "0.1.0",
+		}
 	}
-	awsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return awsMCPClient
 }
@@ -282,9 +264,7 @@ type AwsLambdaParams struct {
 	FunctionTagValue string
 }
 
-func InitAwsLambdaMCPClient(p *AwsLambdaParams, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitAwsLambdaMCPClient(p *AwsLambdaParams, options ...param.Option) *param.MCPClientConf {
 
 	awsMCPClient := &param.MCPClientConf{
 		Name: NpxAwsLambdaServer,
@@ -303,23 +283,22 @@ func InitAwsLambdaMCPClient(p *AwsLambdaParams, protocolVersion string, clientIn
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(awsMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/aws-lambda",
-		Version: "0.1.0",
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/aws-lambda",
+			Version: "0.1.0",
+		}
 	}
-	awsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return awsMCPClient
 }

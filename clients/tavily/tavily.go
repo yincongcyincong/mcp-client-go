@@ -13,9 +13,7 @@ type TavilyParam struct {
 	TavilyApiKey string
 }
 
-func InitTavilyMCPClient(p *TavilyParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitTavilyMCPClient(p *TavilyParam, options ...param.Option) *param.MCPClientConf {
 
 	tavilyMCPClient := &param.MCPClientConf{
 		Name: NpxTavilyMcpServer,
@@ -29,23 +27,22 @@ func InitTavilyMCPClient(p *TavilyParam, protocolVersion string, clientInfo *mcp
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(tavilyMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/tavily",
-		Version: "0.1.0",
+
+	if tavilyMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		tavilyMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if tavilyMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		tavilyMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/tavily",
+			Version: "0.1.0",
+		}
 	}
-	tavilyMCPClient.StdioClientConf.InitReq = initRequest
 
 	return tavilyMCPClient
 }

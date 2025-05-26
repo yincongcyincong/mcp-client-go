@@ -15,9 +15,7 @@ type GoogleCalendarParam struct {
 	GoogleRedirectURI  string
 }
 
-func InitGoogleCalendarMCPClient(p *GoogleCalendarParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitGoogleCalendarMCPClient(p *GoogleCalendarParam, options ...param.Option) *param.MCPClientConf {
 
 	googleCalendarMCPClient := &param.MCPClientConf{
 		Name: NpxGoogleCalendarMcpServer,
@@ -34,23 +32,22 @@ func InitGoogleCalendarMCPClient(p *GoogleCalendarParam, protocolVersion string,
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(googleCalendarMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/googleCalendar",
-		Version: "0.1.0",
+
+	if googleCalendarMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		googleCalendarMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if googleCalendarMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		googleCalendarMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/googleCalendar",
+			Version: "0.1.0",
+		}
 	}
-	googleCalendarMCPClient.StdioClientConf.InitReq = initRequest
 
 	return googleCalendarMCPClient
 }

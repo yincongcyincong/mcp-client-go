@@ -32,3 +32,39 @@ type SSEClientConfig struct {
 	BaseUrl string
 	InitReq mcp.InitializeRequest
 }
+
+type Option func(p *MCPClientConf)
+
+func WithProtocolVersion(protocolVersion string) Option {
+	return func(p *MCPClientConf) {
+		if p.StdioClientConf != nil {
+			p.StdioClientConf.InitReq.Params.ProtocolVersion = protocolVersion
+		}
+		if p.SSEClientConf != nil {
+			p.SSEClientConf.InitReq.Params.ProtocolVersion = protocolVersion
+		}
+	}
+}
+
+func WithClientInfo(clientInfo mcp.Implementation) Option {
+	return func(p *MCPClientConf) {
+		if p.StdioClientConf != nil {
+			p.StdioClientConf.InitReq.Params.ClientInfo = clientInfo
+		}
+		if p.SSEClientConf != nil {
+			p.SSEClientConf.InitReq.Params.ClientInfo = clientInfo
+		}
+	}
+}
+
+func WithToolsBeforeFunc(toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error) Option {
+	return func(p *MCPClientConf) {
+		p.ToolsBeforeFunc = toolsBeforeFunc
+	}
+}
+
+func WithToolsAfterFunc(toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) Option {
+	return func(p *MCPClientConf) {
+		p.ToolsAfterFunc = toolsAfterFunc
+	}
+}

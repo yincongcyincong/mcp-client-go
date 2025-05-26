@@ -13,7 +13,10 @@ import (
 
 func main() {
 	// start grafana-mcp first
-	mc := grafana.InitGrafanaSSEMCPClient("http://localhost:8000/sse", nil, "", nil, nil, nil)
+	mc := grafana.InitGrafanaSSEMCPClient(&grafana.GrafanaParam{
+		BaseUrl: "http://localhost:8000/sse",
+		Options: nil,
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)

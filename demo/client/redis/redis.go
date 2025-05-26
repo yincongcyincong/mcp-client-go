@@ -18,7 +18,7 @@ func main() {
 func npxRedis() {
 	mc := redis.InitRedisMCPClient(&redis.RedisParam{
 		RedisPath: "redis://localhost:39999",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
@@ -52,7 +52,7 @@ func npxRedis() {
 func dockerRedis() {
 	mc := redis.InitDockerRedisMCPClient(&redis.RedisParam{
 		RedisPath: "redis://host.docker.internal:6379",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)

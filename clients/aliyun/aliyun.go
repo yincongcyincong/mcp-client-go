@@ -14,9 +14,7 @@ type AliyunParams struct {
 	AliyunAccessKeySecret string
 }
 
-func InitAliyunMCPClient(p *AliyunParams, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitAliyunMCPClient(p *AliyunParams, options ...param.Option) *param.MCPClientConf {
 
 	awsMCPClient := &param.MCPClientConf{
 		Name: UvxAliyunMcpServer,
@@ -31,23 +29,22 @@ func InitAliyunMCPClient(p *AliyunParams, protocolVersion string, clientInfo *mc
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(awsMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/aws-core",
-		Version: "0.1.0",
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/aws-core",
+			Version: "0.1.0",
+		}
 	}
-	awsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return awsMCPClient
 }

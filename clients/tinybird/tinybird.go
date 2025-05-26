@@ -14,9 +14,7 @@ type TinyBirdParams struct {
 	TBAdminToken string
 }
 
-func InitTinyBirdMCPClient(p *TinyBirdParams, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitTinyBirdMCPClient(p *TinyBirdParams, options ...param.Option) *param.MCPClientConf {
 
 	awsMCPClient := &param.MCPClientConf{
 		Name: UvxTinyBirdServer,
@@ -32,23 +30,21 @@ func InitTinyBirdMCPClient(p *TinyBirdParams, protocolVersion string, clientInfo
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(awsMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/tiny-bird",
-		Version: "0.1.0",
-	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
-	}
-	awsMCPClient.StdioClientConf.InitReq = initRequest
 
+	if awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
+	}
+
+	if awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		awsMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/tinybird",
+			Version: "0.1.0",
+		}
+	}
 	return awsMCPClient
 }

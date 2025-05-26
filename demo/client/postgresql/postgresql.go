@@ -14,7 +14,7 @@ import (
 func main() {
 	mc := postgresql.InitPostgresqlMCPClient(&postgresql.PostgreSQLParam{
 		PostgresqlLink: "postgres://postgres:password@localhost:5432/mydatabase",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)

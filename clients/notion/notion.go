@@ -15,9 +15,7 @@ type NotionParam struct {
 	NotionVersion string
 }
 
-func InitNotionMCPClient(p *NotionParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitNotionMCPClient(p *NotionParam, options ...param.Option) *param.MCPClientConf {
 
 	notionMCPClient := &param.MCPClientConf{
 		Name:       NpxNotionMcpServer,
@@ -32,23 +30,22 @@ func InitNotionMCPClient(p *NotionParam, protocolVersion string, clientInfo *mcp
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(notionMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/notion",
-		Version: "0.1.0",
+
+	if notionMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		notionMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if notionMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		notionMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/notion",
+			Version: "0.1.0",
+		}
 	}
-	notionMCPClient.StdioClientConf.InitReq = initRequest
 
 	return notionMCPClient
 }

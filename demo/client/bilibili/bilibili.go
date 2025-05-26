@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	mc := bilibili.InitBilibiliMCPClient(&bilibili.BilibiliParam{}, "", nil, nil, nil)
+	mc := bilibili.InitBilibiliMCPClient(&bilibili.BilibiliParam{})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)

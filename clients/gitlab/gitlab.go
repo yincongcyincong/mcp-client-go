@@ -15,9 +15,7 @@ type GitlabParam struct {
 	GitlabUrl    string
 }
 
-func InitGitlabMCPClient(p *GitlabParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitGitlabMCPClient(p *GitlabParam, options ...param.Option) *param.MCPClientConf {
 
 	gitlabMCPClient := &param.MCPClientConf{
 		Name: NpxGitlabMcpServer,
@@ -33,30 +31,27 @@ func InitGitlabMCPClient(p *GitlabParam, protocolVersion string, clientInfo *mcp
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(gitlabMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/gitlab",
-		Version: "0.1.0",
+
+	if gitlabMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		gitlabMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if gitlabMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		gitlabMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/gitlab",
+			Version: "0.1.0",
+		}
 	}
-	gitlabMCPClient.StdioClientConf.InitReq = initRequest
 
 	return gitlabMCPClient
 }
 
-func InitDockerGitlabMCPClient(p *GitlabParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerGitlabMCPClient(p *GitlabParam, options ...param.Option) *param.MCPClientConf {
 
 	gitlabMCPClient := &param.MCPClientConf{
 		Name: DockerGitlabMcpServer,
@@ -78,23 +73,22 @@ func InitDockerGitlabMCPClient(p *GitlabParam, protocolVersion string, clientInf
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(gitlabMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/gitlab",
-		Version: "0.1.0",
+
+	if gitlabMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		gitlabMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if gitlabMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		gitlabMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/gitlab",
+			Version: "0.1.0",
+		}
 	}
-	gitlabMCPClient.StdioClientConf.InitReq = initRequest
 
 	return gitlabMCPClient
 }

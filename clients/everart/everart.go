@@ -13,9 +13,7 @@ type EverartParam struct {
 	EverartApiKey string
 }
 
-func InitEverartMCPClient(p *EverartParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitEverartMCPClient(p *EverartParam, options ...param.Option) *param.MCPClientConf {
 
 	everartMCPClient := &param.MCPClientConf{
 		Name: NpxEverartMcpServer,
@@ -30,23 +28,22 @@ func InitEverartMCPClient(p *EverartParam, protocolVersion string, clientInfo *m
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(everartMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/everart",
-		Version: "0.1.0",
+
+	if everartMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		everartMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if everartMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		everartMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/everart",
+			Version: "0.1.0",
+		}
 	}
-	everartMCPClient.StdioClientConf.InitReq = initRequest
 
 	return everartMCPClient
 }

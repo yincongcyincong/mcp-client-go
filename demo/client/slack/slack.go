@@ -16,7 +16,7 @@ func main() {
 	mc := slack.InitSlackMCPClient(&slack.SlackParam{
 		SlackBotToken: "xxx",
 		SlackTeamID:   "xxx",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
@@ -37,7 +37,9 @@ func main() {
 		fmt.Println(string(toolByte))
 	}
 
-	data, err := c.ExecTools(ctx, "list_commits", map[string]interface{}{})
+	data, err := c.ExecTools(ctx, "slack_get_user_profile", map[string]interface{}{
+		"user_id": 123,
+	})
 	if err != nil {
 		log.Fatal("ExecTools failed:", err)
 	}

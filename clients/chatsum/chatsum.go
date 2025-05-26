@@ -14,9 +14,7 @@ type ChatsumParam struct {
 	indexJsPath string
 }
 
-func InitChatsumMCPClient(p *ChatsumParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitChatsumMCPClient(p *ChatsumParam, options ...param.Option) *param.MCPClientConf {
 
 	chatsumMCPClient := &param.MCPClientConf{
 		Name: NodeChatsumMcpServer,
@@ -30,23 +28,22 @@ func InitChatsumMCPClient(p *ChatsumParam, protocolVersion string, clientInfo *m
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(chatsumMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/chatsum",
-		Version: "0.1.0",
+
+	if chatsumMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		chatsumMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if chatsumMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		chatsumMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/chatsum",
+			Version: "0.1.0",
+		}
 	}
-	chatsumMCPClient.StdioClientConf.InitReq = initRequest
 
 	return chatsumMCPClient
 }

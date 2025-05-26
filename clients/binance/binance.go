@@ -13,9 +13,7 @@ type BinanceParam struct {
 	BinanceApiKey string
 }
 
-func InitBinanceMCPClient(p *BinanceParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitBinanceMCPClient(p *BinanceParam, options ...param.Option) *param.MCPClientConf {
 
 	binanceMCPClient := &param.MCPClientConf{
 		Name: NpxBinanceMcpServer,
@@ -30,23 +28,22 @@ func InitBinanceMCPClient(p *BinanceParam, protocolVersion string, clientInfo *m
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(binanceMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/binance",
-		Version: "0.1.0",
+
+	if binanceMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		binanceMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if binanceMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		binanceMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/binance",
+			Version: "0.1.0",
+		}
 	}
-	binanceMCPClient.StdioClientConf.InitReq = initRequest
 
 	return binanceMCPClient
 }

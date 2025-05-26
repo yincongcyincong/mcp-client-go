@@ -13,9 +13,7 @@ type IpfsParam struct {
 	W3LoginEmail string
 }
 
-func InitIpfsMCPClient(p *IpfsParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitIpfsMCPClient(p *IpfsParam, options ...param.Option) *param.MCPClientConf {
 
 	ipfsMCPClient := &param.MCPClientConf{
 		Name: NpxIpfsMcpServer,
@@ -30,23 +28,22 @@ func InitIpfsMCPClient(p *IpfsParam, protocolVersion string, clientInfo *mcp.Imp
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(ipfsMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/ipfs",
-		Version: "0.1.0",
+
+	if ipfsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		ipfsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if ipfsMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		ipfsMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/ipfs",
+			Version: "0.1.0",
+		}
 	}
-	ipfsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return ipfsMCPClient
 }

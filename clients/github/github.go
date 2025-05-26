@@ -14,11 +14,9 @@ type GithubParam struct {
 	GithubAccessToken string
 }
 
-func InitModelContextProtocolGithubMCPClient(p *GithubParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitModelContextProtocolGithubMCPClient(p *GithubParam, options ...param.Option) *param.MCPClientConf {
 
-	amapMCPClient := &param.MCPClientConf{
+	githubMCPClient := &param.MCPClientConf{
 		Name: NpxModelContextProtocolGithubServer,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "npx",
@@ -31,34 +29,29 @@ func InitModelContextProtocolGithubMCPClient(p *GithubParam, protocolVersion str
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(githubMCPClient)
 	}
 
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "modelcontextprotocol/server-github",
-		Version: "0.2.0",
-	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+	if githubMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		githubMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
 
-	amapMCPClient.StdioClientConf.InitReq = initRequest
+	if githubMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		githubMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/server-github",
+			Version: "0.2.0",
+		}
+	}
 
-	return amapMCPClient
+	return githubMCPClient
 }
 
-func InitDockerGithubMCPClient(p *GithubParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerGithubMCPClient(p *GithubParam, options ...param.Option) *param.MCPClientConf {
 
-	amapMCPClient := &param.MCPClientConf{
+	githubMCPClient := &param.MCPClientConf{
 		Name: DockerGithubServer,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "docker",
@@ -75,25 +68,22 @@ func InitDockerGithubMCPClient(p *GithubParam, protocolVersion string, clientInf
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(githubMCPClient)
 	}
 
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "modelcontextprotocol/server-github",
-		Version: "0.2.0",
-	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+	if githubMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		githubMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
 
-	amapMCPClient.StdioClientConf.InitReq = initRequest
+	if githubMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		githubMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/github",
+			Version: "0.1.0",
+		}
+	}
 
-	return amapMCPClient
+	return githubMCPClient
 }

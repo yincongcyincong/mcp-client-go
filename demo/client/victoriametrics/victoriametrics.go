@@ -14,7 +14,7 @@ import (
 func main() {
 	mc := victoriametrics.InitVictoriaMetricsMCPClient(&victoriametrics.VictoriaMetricsParam{
 		VMUrl: "http://localhost:8428",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)

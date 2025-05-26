@@ -13,9 +13,7 @@ type FireCrawlParam struct {
 	FilecrawlApiKey string
 }
 
-func InitFirecrawlMCPClient(p *FireCrawlParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitFirecrawlMCPClient(p *FireCrawlParam, options ...param.Option) *param.MCPClientConf {
 
 	firecrawlMCPClient := &param.MCPClientConf{
 		Name: NpxFirecrawlMcpServer,
@@ -30,23 +28,22 @@ func InitFirecrawlMCPClient(p *FireCrawlParam, protocolVersion string, clientInf
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(firecrawlMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/firecrawl",
-		Version: "0.1.0",
+
+	if firecrawlMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		firecrawlMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if firecrawlMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		firecrawlMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/firecrawl",
+			Version: "0.1.0",
+		}
 	}
-	firecrawlMCPClient.StdioClientConf.InitReq = initRequest
 
 	return firecrawlMCPClient
 }

@@ -16,7 +16,7 @@ func main() {
 		TelegramApiId:         "123",
 		TelegramApiHash:       "xxx",
 		TelegramSessionString: "xxx",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)

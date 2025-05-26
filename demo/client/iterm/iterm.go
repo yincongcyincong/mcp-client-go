@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	mc := iterm.InitItermMCPClient(&iterm.ItermParam{}, "", nil, nil, nil)
+	mc := iterm.InitItermMCPClient(&iterm.ItermParam{})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)

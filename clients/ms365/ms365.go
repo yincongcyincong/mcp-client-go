@@ -13,9 +13,7 @@ type MS365Param struct {
 	MS365Session string
 }
 
-func InitMS365MCPClient(p *MS365Param, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitMS365MCPClient(p *MS365Param, options ...param.Option) *param.MCPClientConf {
 
 	ms365MCPClient := &param.MCPClientConf{
 		Name: NpxMS365McpServer,
@@ -28,23 +26,22 @@ func InitMS365MCPClient(p *MS365Param, protocolVersion string, clientInfo *mcp.I
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(ms365MCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/ms365",
-		Version: "0.1.0",
+
+	if ms365MCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		ms365MCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if ms365MCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		ms365MCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/m365",
+			Version: "0.1.0",
+		}
 	}
-	ms365MCPClient.StdioClientConf.InitReq = initRequest
 
 	return ms365MCPClient
 }

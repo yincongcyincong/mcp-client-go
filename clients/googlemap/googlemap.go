@@ -14,9 +14,7 @@ type GoogleMapParam struct {
 	GooglemapApiKey string
 }
 
-func InitGooglemapMCPClient(p *GoogleMapParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitGooglemapMCPClient(p *GoogleMapParam, options ...param.Option) *param.MCPClientConf {
 
 	googlemapMCPClient := &param.MCPClientConf{
 		Name: NpxGooglemapMcpServer,
@@ -31,30 +29,27 @@ func InitGooglemapMCPClient(p *GoogleMapParam, protocolVersion string, clientInf
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(googlemapMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/googlemap",
-		Version: "0.1.0",
+
+	if googlemapMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		googlemapMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if googlemapMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		googlemapMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/googlemap",
+			Version: "0.1.0",
+		}
 	}
-	googlemapMCPClient.StdioClientConf.InitReq = initRequest
 
 	return googlemapMCPClient
 }
 
-func InitDockerGooglemapMCPClient(p *GoogleMapParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerGooglemapMCPClient(p *GoogleMapParam, options ...param.Option) *param.MCPClientConf {
 
 	googlemapMCPClient := &param.MCPClientConf{
 		Name: DockerGooglemapMcpServer,
@@ -73,23 +68,22 @@ func InitDockerGooglemapMCPClient(p *GoogleMapParam, protocolVersion string, cli
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(googlemapMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/googlemap",
-		Version: "0.1.0",
+
+	if googlemapMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		googlemapMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if googlemapMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		googlemapMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/googlemap",
+			Version: "0.1.0",
+		}
 	}
-	googlemapMCPClient.StdioClientConf.InitReq = initRequest
 
 	return googlemapMCPClient
 }

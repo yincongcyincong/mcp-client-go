@@ -13,9 +13,7 @@ type LeetcodeParam struct {
 	LeetcodeSession string
 }
 
-func InitLeetcodeMCPClient(p *LeetcodeParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitLeetcodeMCPClient(p *LeetcodeParam, options ...param.Option) *param.MCPClientConf {
 
 	leetcodeMCPClient := &param.MCPClientConf{
 		Name: NpxLeetcodeMcpServer,
@@ -31,23 +29,22 @@ func InitLeetcodeMCPClient(p *LeetcodeParam, protocolVersion string, clientInfo 
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(leetcodeMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/leetcode",
-		Version: "0.1.0",
+
+	if leetcodeMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		leetcodeMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if leetcodeMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		leetcodeMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/leetcode",
+			Version: "0.1.0",
+		}
 	}
-	leetcodeMCPClient.StdioClientConf.InitReq = initRequest
 
 	return leetcodeMCPClient
 }

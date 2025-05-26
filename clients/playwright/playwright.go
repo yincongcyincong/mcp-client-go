@@ -13,11 +13,12 @@ const (
 
 type PlaywrightParam struct {
 	Args []string
+
+	BaseUrl string
+	Options []transport.ClientOption
 }
 
-func InitPlaywrightMCPClient(p *PlaywrightParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitPlaywrightMCPClient(p *PlaywrightParam, options ...param.Option) *param.MCPClientConf {
 
 	playwrightMCPClient := &param.MCPClientConf{
 		Name:       NpxPlaywrightMcpServer,
@@ -30,58 +31,53 @@ func InitPlaywrightMCPClient(p *PlaywrightParam, protocolVersion string, clientI
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
 	playwrightMCPClient.StdioClientConf.Args = append(playwrightMCPClient.StdioClientConf.Args, p.Args...)
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(playwrightMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/playwright",
-		Version: "0.1.0",
+
+	if playwrightMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		playwrightMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if playwrightMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		playwrightMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/amap-maps",
+			Version: "0.1.0",
+		}
 	}
-	playwrightMCPClient.StdioClientConf.InitReq = initRequest
 
 	return playwrightMCPClient
 }
 
-func InitPlaywrightSSEMCPClient(baseUrl string, options []transport.ClientOption,
-	protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitPlaywrightSSEMCPClient(p *PlaywrightParam, options ...param.Option) *param.MCPClientConf {
 
 	playwrightMCPClient := &param.MCPClientConf{
 		Name:       SsePlaywrightMcpServer,
 		ClientType: param.SSEType,
 		SSEClientConf: &param.SSEClientConfig{
-			BaseUrl: baseUrl,
-			Options: options,
+			BaseUrl: p.BaseUrl,
+			Options: p.Options,
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(playwrightMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/playwright",
-		Version: "0.1.0",
+
+	if playwrightMCPClient.SSEClientConf.InitReq.Params.ProtocolVersion == "" {
+		playwrightMCPClient.SSEClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if playwrightMCPClient.SSEClientConf.InitReq.Params.ClientInfo.Name == "" {
+		playwrightMCPClient.SSEClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/playwright",
+			Version: "0.1.0",
+		}
 	}
-	playwrightMCPClient.SSEClientConf.InitReq = initRequest
 
 	return playwrightMCPClient
 }

@@ -12,9 +12,7 @@ const (
 type CloudflareParam struct {
 }
 
-func InitCloudflareMCPClient(p *CloudflareParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitCloudflareMCPClient(p *CloudflareParam, options ...param.Option) *param.MCPClientConf {
 
 	cloudflareMCPClient := &param.MCPClientConf{
 		Name:       NpxCloudflareMcpServer,
@@ -28,23 +26,22 @@ func InitCloudflareMCPClient(p *CloudflareParam, protocolVersion string, clientI
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(cloudflareMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/cloudflare",
-		Version: "0.1.0",
+
+	if cloudflareMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		cloudflareMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if cloudflareMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		cloudflareMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/cloudflare",
+			Version: "0.1.0",
+		}
 	}
-	cloudflareMCPClient.StdioClientConf.InitReq = initRequest
 
 	return cloudflareMCPClient
 }

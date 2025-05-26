@@ -14,9 +14,7 @@ type SentryParam struct {
 	SentryToken string
 }
 
-func InitSentryMCPClient(p *SentryParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitSentryMCPClient(p *SentryParam, options ...param.Option) *param.MCPClientConf {
 
 	sentryMCPClient := &param.MCPClientConf{
 		Name: UvxSentryMcpServer,
@@ -30,30 +28,27 @@ func InitSentryMCPClient(p *SentryParam, protocolVersion string, clientInfo *mcp
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(sentryMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/sentry",
-		Version: "0.1.0",
+
+	if sentryMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		sentryMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if sentryMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		sentryMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/sentry",
+			Version: "0.1.0",
+		}
 	}
-	sentryMCPClient.StdioClientConf.InitReq = initRequest
 
 	return sentryMCPClient
 }
 
-func InitDockerSentryMCPClient(p *SentryParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerSentryMCPClient(p *SentryParam, options ...param.Option) *param.MCPClientConf {
 
 	sentryMCPClient := &param.MCPClientConf{
 		Name: DockerSentryMcpServer,
@@ -70,23 +65,22 @@ func InitDockerSentryMCPClient(p *SentryParam, protocolVersion string, clientInf
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(sentryMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/sentry",
-		Version: "0.1.0",
+
+	if sentryMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		sentryMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if sentryMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		sentryMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/sentry",
+			Version: "0.1.0",
+		}
 	}
-	sentryMCPClient.StdioClientConf.InitReq = initRequest
 
 	return sentryMCPClient
 }

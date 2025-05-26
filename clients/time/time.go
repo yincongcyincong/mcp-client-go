@@ -10,13 +10,11 @@ const (
 	DockerTimeMcpServer = "docker-time-mcp-server"
 )
 
-type TimeParma struct {
+type TimeParam struct {
 	LocalTimezone string
 }
 
-func InitTimeMCPClient(p *TimeParma, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitTimeMCPClient(p *TimeParam, options ...param.Option) *param.MCPClientConf {
 
 	if p.LocalTimezone == "" {
 		p.LocalTimezone = "Asia/Shanghai"
@@ -33,30 +31,27 @@ func InitTimeMCPClient(p *TimeParma, protocolVersion string, clientInfo *mcp.Imp
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(timeMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/time",
-		Version: "0.1.0",
+
+	if timeMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		timeMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if timeMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		timeMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/time",
+			Version: "0.1.0",
+		}
 	}
-	timeMCPClient.StdioClientConf.InitReq = initRequest
 
 	return timeMCPClient
 }
 
-func InitDockerTimeMCPClient(p *TimeParma, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerTimeMCPClient(p *TimeParam, options ...param.Option) *param.MCPClientConf {
 
 	if p.LocalTimezone == "" {
 		p.LocalTimezone = "Asia/Shanghai"
@@ -75,23 +70,22 @@ func InitDockerTimeMCPClient(p *TimeParma, protocolVersion string, clientInfo *m
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(timeMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/time",
-		Version: "0.1.0",
+
+	if timeMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		timeMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if timeMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		timeMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/time",
+			Version: "0.1.0",
+		}
 	}
-	timeMCPClient.StdioClientConf.InitReq = initRequest
 
 	return timeMCPClient
 }

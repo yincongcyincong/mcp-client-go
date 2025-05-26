@@ -12,9 +12,7 @@ const (
 type AirbnbParam struct {
 }
 
-func InitAirbnbMCPClient(p *AirbnbParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitAirbnbMCPClient(p *AirbnbParam, options ...param.Option) *param.MCPClientConf {
 
 	airbnbMCPClient := &param.MCPClientConf{
 		Name: NpxAirbnbMcpServer,
@@ -28,23 +26,22 @@ func InitAirbnbMCPClient(p *AirbnbParam, protocolVersion string, clientInfo *mcp
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(airbnbMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/airbnb",
-		Version: "0.1.0",
+
+	if airbnbMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		airbnbMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if airbnbMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		airbnbMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/airbnb",
+			Version: "0.1.0",
+		}
 	}
-	airbnbMCPClient.StdioClientConf.InitReq = initRequest
 
 	return airbnbMCPClient
 }

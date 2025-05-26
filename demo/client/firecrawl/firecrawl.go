@@ -15,7 +15,7 @@ func main() {
 	// todo modify token
 	mc := firecrawl.InitFirecrawlMCPClient(&firecrawl.FireCrawlParam{
 		FilecrawlApiKey: "fc-xxxx",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)

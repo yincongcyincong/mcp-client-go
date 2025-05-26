@@ -15,11 +15,9 @@ type JiraParams struct {
 	AtlassianToken string
 }
 
-func InitDockerFetchMCPClient(p *JiraParams, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerJiraMCPClient(p *JiraParams, options ...param.Option) *param.MCPClientConf {
 
-	fetchMCPClient := &param.MCPClientConf{
+	jiraMCPClient := &param.MCPClientConf{
 		Name: DockerJiraMcpServer,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: "docker",
@@ -35,23 +33,22 @@ func InitDockerFetchMCPClient(p *JiraParams, protocolVersion string, clientInfo 
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(jiraMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/fetch",
-		Version: "0.1.0",
-	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
-	}
-	fetchMCPClient.StdioClientConf.InitReq = initRequest
 
-	return fetchMCPClient
+	if jiraMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		jiraMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
+	}
+
+	if jiraMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		jiraMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/jira",
+			Version: "0.1.0",
+		}
+	}
+
+	return jiraMCPClient
 }

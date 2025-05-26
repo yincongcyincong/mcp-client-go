@@ -13,9 +13,7 @@ type FlomoParam struct {
 	FilecrawlApiUrl string
 }
 
-func InitFlomoMCPClient(p *FlomoParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitFlomoMCPClient(p *FlomoParam, options ...param.Option) *param.MCPClientConf {
 
 	flomoMCPClient := &param.MCPClientConf{
 		Name: NpxFlomoMcpServer,
@@ -30,23 +28,22 @@ func InitFlomoMCPClient(p *FlomoParam, protocolVersion string, clientInfo *mcp.I
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(flomoMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/flomo",
-		Version: "0.1.0",
+
+	if flomoMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		flomoMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if flomoMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		flomoMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/flomo",
+			Version: "0.1.0",
+		}
 	}
-	flomoMCPClient.StdioClientConf.InitReq = initRequest
 
 	return flomoMCPClient
 }

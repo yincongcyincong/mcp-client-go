@@ -13,7 +13,9 @@ import (
 
 func main() {
 	// execute `npx @playwright/mcp@latest --port 8931` first
-	mc := playwright.InitPlaywrightSSEMCPClient("http://localhost:8931/sse", nil, "", nil, nil, nil)
+	mc := playwright.InitPlaywrightSSEMCPClient(&playwright.PlaywrightParam{
+		BaseUrl: "http://localhost:8931/sse",
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)

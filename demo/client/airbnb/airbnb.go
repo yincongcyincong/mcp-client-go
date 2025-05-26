@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	mc := airbnb.InitAirbnbMCPClient(&airbnb.AirbnbParam{}, "", nil, nil, nil)
+	mc := airbnb.InitAirbnbMCPClient(&airbnb.AirbnbParam{})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)

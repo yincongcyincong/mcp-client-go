@@ -12,9 +12,7 @@ const (
 type BitcoinParam struct {
 }
 
-func InitBitcoinMCPClient(p *BitcoinParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitBitcoinMCPClient(p *BitcoinParam, options ...param.Option) *param.MCPClientConf {
 
 	bitcoinMCPClient := &param.MCPClientConf{
 		Name: NpxBitcoinMcpServer,
@@ -27,23 +25,22 @@ func InitBitcoinMCPClient(p *BitcoinParam, protocolVersion string, clientInfo *m
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(bitcoinMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/bitcoin",
-		Version: "0.1.0",
+
+	if bitcoinMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		bitcoinMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if bitcoinMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		bitcoinMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/bitcoin",
+			Version: "0.1.0",
+		}
 	}
-	bitcoinMCPClient.StdioClientConf.InitReq = initRequest
 
 	return bitcoinMCPClient
 }

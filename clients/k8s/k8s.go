@@ -20,9 +20,7 @@ type K8sParam struct {
 	K8sMcpTimeout int
 }
 
-func InitDockerK8sMCPClient(p *K8sParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerK8sMCPClient(p *K8sParam, options ...param.Option) *param.MCPClientConf {
 
 	k8sMCPClient := &param.MCPClientConf{
 		Name: DockerK8sMcpServer,
@@ -39,23 +37,22 @@ func InitDockerK8sMCPClient(p *K8sParam, protocolVersion string, clientInfo *mcp
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(k8sMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/k8s",
-		Version: "0.1.0",
+
+	if k8sMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		k8sMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if k8sMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		k8sMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/k8s",
+			Version: "0.1.0",
+		}
 	}
-	k8sMCPClient.StdioClientConf.InitReq = initRequest
 
 	return k8sMCPClient
 }
@@ -67,9 +64,7 @@ type AwsK8sParam struct {
 	AwsRegion   string
 }
 
-func InitDockerAwsK8sMCPClient(p *AwsK8sParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerAwsK8sMCPClient(p *AwsK8sParam, options ...param.Option) *param.MCPClientConf {
 
 	k8sMCPClient := &param.MCPClientConf{
 		Name: DockerAwsK8sMcpServer,
@@ -86,23 +81,22 @@ func InitDockerAwsK8sMCPClient(p *AwsK8sParam, protocolVersion string, clientInf
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(k8sMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/aws-k8s",
-		Version: "0.1.0",
+
+	if k8sMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		k8sMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if k8sMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		k8sMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/aws-k8s",
+			Version: "0.1.0",
+		}
 	}
-	k8sMCPClient.StdioClientConf.InitReq = initRequest
 
 	return k8sMCPClient
 }
@@ -114,9 +108,7 @@ type GcloudK8sParam struct {
 	CloudComputeRegion  string
 }
 
-func InitDockerGcloudK8sMCPClient(p *GcloudK8sParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerGcloudK8sMCPClient(p *GcloudK8sParam, options ...param.Option) *param.MCPClientConf {
 
 	k8sMCPClient := &param.MCPClientConf{
 		Name: DockerGcloudMcpServer,
@@ -133,23 +125,22 @@ func InitDockerGcloudK8sMCPClient(p *GcloudK8sParam, protocolVersion string, cli
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(k8sMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/gcloud-k8s",
-		Version: "0.1.0",
+
+	if k8sMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		k8sMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if k8sMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		k8sMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/gcloud-k8s",
+			Version: "0.1.0",
+		}
 	}
-	k8sMCPClient.StdioClientConf.InitReq = initRequest
 
 	return k8sMCPClient
 }
@@ -160,9 +151,7 @@ type AzureK8sParam struct {
 	AzureSubscription string
 }
 
-func InitDockerAzureK8sMCPClient(p *AzureK8sParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerAzureK8sMCPClient(p *AzureK8sParam, options ...param.Option) *param.MCPClientConf {
 
 	k8sMCPClient := &param.MCPClientConf{
 		Name: DockerAzureMcpServer,
@@ -178,23 +167,22 @@ func InitDockerAzureK8sMCPClient(p *AzureK8sParam, protocolVersion string, clien
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(k8sMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/azure-k8s",
-		Version: "0.1.0",
+
+	if k8sMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		k8sMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if k8sMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		k8sMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/azure-k8s",
+			Version: "0.1.0",
+		}
 	}
-	k8sMCPClient.StdioClientConf.InitReq = initRequest
 
 	return k8sMCPClient
 }

@@ -14,9 +14,7 @@ type PostgreSQLParam struct {
 	PostgresqlLink string
 }
 
-func InitPostgresqlMCPClient(p *PostgreSQLParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitPostgresqlMCPClient(p *PostgreSQLParam, options ...param.Option) *param.MCPClientConf {
 
 	postgresqlMCPClient := &param.MCPClientConf{
 		Name: NpxPostgresqlMcpServer,
@@ -30,30 +28,26 @@ func InitPostgresqlMCPClient(p *PostgreSQLParam, protocolVersion string, clientI
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(postgresqlMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/postgresql",
-		Version: "0.1.0",
-	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
-	}
-	postgresqlMCPClient.StdioClientConf.InitReq = initRequest
 
+	if postgresqlMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		postgresqlMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
+	}
+
+	if postgresqlMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		postgresqlMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/postgresql",
+			Version: "0.1.0",
+		}
+	}
 	return postgresqlMCPClient
 }
 
-func InitDockerPostgresqlMCPClient(p *PostgreSQLParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerPostgresqlMCPClient(p *PostgreSQLParam, options ...param.Option) *param.MCPClientConf {
 
 	postgresqlMCPClient := &param.MCPClientConf{
 		Name: DockerPostgresqlMcpServer,
@@ -69,23 +63,22 @@ func InitDockerPostgresqlMCPClient(p *PostgreSQLParam, protocolVersion string, c
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(postgresqlMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/postgresql",
-		Version: "0.1.0",
+
+	if postgresqlMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		postgresqlMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if postgresqlMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		postgresqlMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/postgresql",
+			Version: "0.1.0",
+		}
 	}
-	postgresqlMCPClient.StdioClientConf.InitReq = initRequest
 
 	return postgresqlMCPClient
 }

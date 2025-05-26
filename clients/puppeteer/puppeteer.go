@@ -10,9 +10,10 @@ const (
 	DockerPuppeteerMcpServer = "docker-puppeteer-mcp-server"
 )
 
-func InitPuppeteerMCPClient(protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+type PuppeteerParam struct {
+}
+
+func InitPuppeteerMCPClient(p *PuppeteerParam, options ...param.Option) *param.MCPClientConf {
 
 	puppeteerMCPClient := &param.MCPClientConf{
 		Name: NpxPuppeteerMcpServer,
@@ -25,30 +26,27 @@ func InitPuppeteerMCPClient(protocolVersion string, clientInfo *mcp.Implementati
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(puppeteerMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/puppeteer",
-		Version: "0.1.0",
+
+	if puppeteerMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		puppeteerMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if puppeteerMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		puppeteerMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/puppeteer",
+			Version: "0.1.0",
+		}
 	}
-	puppeteerMCPClient.StdioClientConf.InitReq = initRequest
 
 	return puppeteerMCPClient
 }
 
-func InitDockerPuppeteerMCPClient(protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerPuppeteerMCPClient(p *PuppeteerParam, options ...param.Option) *param.MCPClientConf {
 
 	puppeteerMCPClient := &param.MCPClientConf{
 		Name: DockerPuppeteerMcpServer,
@@ -65,23 +63,22 @@ func InitDockerPuppeteerMCPClient(protocolVersion string, clientInfo *mcp.Implem
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(puppeteerMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/puppeteer",
-		Version: "0.1.0",
+
+	if puppeteerMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		puppeteerMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if puppeteerMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		puppeteerMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/puppeteer",
+			Version: "0.1.0",
+		}
 	}
-	puppeteerMCPClient.StdioClientConf.InitReq = initRequest
 
 	return puppeteerMCPClient
 }

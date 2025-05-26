@@ -10,37 +10,36 @@ const (
 	SSEGrafanaMcpServer = "sse-grafana-mcp-server"
 )
 
-type GoogleMapParam struct{}
+type GrafanaParam struct {
+	BaseUrl string
+	Options []transport.ClientOption
+}
 
-func InitGrafanaSSEMCPClient(baseUrl string, options []transport.ClientOption,
-	protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitGrafanaSSEMCPClient(p *GrafanaParam, options ...param.Option) *param.MCPClientConf {
 
 	grafanaMCPClient := &param.MCPClientConf{
 		Name:       SSEGrafanaMcpServer,
 		ClientType: param.SSEType,
 		SSEClientConf: &param.SSEClientConfig{
-			BaseUrl: baseUrl,
-			Options: options,
+			BaseUrl: p.BaseUrl,
+			Options: p.Options,
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(grafanaMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/grafana",
-		Version: "0.1.0",
+
+	if grafanaMCPClient.SSEClientConf.InitReq.Params.ProtocolVersion == "" {
+		grafanaMCPClient.SSEClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if grafanaMCPClient.SSEClientConf.InitReq.Params.ClientInfo.Name == "" {
+		grafanaMCPClient.SSEClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/grafana",
+			Version: "0.1.0",
+		}
 	}
-	grafanaMCPClient.SSEClientConf.InitReq = initRequest
 
 	return grafanaMCPClient
 }

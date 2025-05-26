@@ -30,9 +30,7 @@ type MysqlParam struct {
 	AllowDeleteOperation    string
 }
 
-func InitMysqlMCPClient(p *MysqlParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitMysqlMCPClient(p *MysqlParam, options ...param.Option) *param.MCPClientConf {
 
 	mysqlMCPClient := &param.MCPClientConf{
 		Name: NpxMysqlMcpServer,
@@ -73,23 +71,22 @@ func InitMysqlMCPClient(p *MysqlParam, protocolVersion string, clientInfo *mcp.I
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(mysqlMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/mysql",
-		Version: "0.1.0",
+
+	if mysqlMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		mysqlMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if mysqlMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		mysqlMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/mysql",
+			Version: "0.1.0",
+		}
 	}
-	mysqlMCPClient.StdioClientConf.InitReq = initRequest
 
 	return mysqlMCPClient
 }

@@ -15,9 +15,7 @@ type SlackParam struct {
 	SlackTeamID   string
 }
 
-func InitSlackMCPClient(p *SlackParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitSlackMCPClient(p *SlackParam, options ...param.Option) *param.MCPClientConf {
 
 	slackMCPClient := &param.MCPClientConf{
 		Name: NpxSlackMcpServer,
@@ -33,30 +31,27 @@ func InitSlackMCPClient(p *SlackParam, protocolVersion string, clientInfo *mcp.I
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(slackMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/slack",
-		Version: "0.1.0",
+
+	if slackMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		slackMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if slackMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		slackMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/slack",
+			Version: "0.1.0",
+		}
 	}
-	slackMCPClient.StdioClientConf.InitReq = initRequest
 
 	return slackMCPClient
 }
 
-func InitDockerSlackMCPClient(p *SlackParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerSlackMCPClient(p *SlackParam, options ...param.Option) *param.MCPClientConf {
 
 	slackMCPClient := &param.MCPClientConf{
 		Name: DockerSlackMcpServer,
@@ -78,23 +73,22 @@ func InitDockerSlackMCPClient(p *SlackParam, protocolVersion string, clientInfo 
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(slackMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/slack",
-		Version: "0.1.0",
+
+	if slackMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		slackMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if slackMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		slackMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/slack",
+			Version: "0.1.0",
+		}
 	}
-	slackMCPClient.StdioClientConf.InitReq = initRequest
 
 	return slackMCPClient
 }

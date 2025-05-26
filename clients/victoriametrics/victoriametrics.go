@@ -15,9 +15,7 @@ type VictoriaMetricsParam struct {
 	VMInsertUrl string
 }
 
-func InitVictoriaMetricsMCPClient(p *VictoriaMetricsParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitVictoriaMetricsMCPClient(p *VictoriaMetricsParam, options ...param.Option) *param.MCPClientConf {
 
 	victoriametricsMCPClient := &param.MCPClientConf{
 		Name: NpxVictoriaMetricsMcpServer,
@@ -34,23 +32,22 @@ func InitVictoriaMetricsMCPClient(p *VictoriaMetricsParam, protocolVersion strin
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(victoriametricsMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/victoriametrics",
-		Version: "0.1.0",
+
+	if victoriametricsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		victoriametricsMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if victoriametricsMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		victoriametricsMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/victoriametrics",
+			Version: "0.1.0",
+		}
 	}
-	victoriametricsMCPClient.StdioClientConf.InitReq = initRequest
 
 	return victoriametricsMCPClient
 }

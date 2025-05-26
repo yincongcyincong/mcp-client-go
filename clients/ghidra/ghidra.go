@@ -15,9 +15,7 @@ type GhidraParam struct {
 	ServerUrl  string
 }
 
-func InitGhidraMCPClient(p *GhidraParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitGhidraMCPClient(p *GhidraParam, options ...param.Option) *param.MCPClientConf {
 
 	ghidraMCPClient := &param.MCPClientConf{
 		Name: NpxGhidraMcpServer,
@@ -31,23 +29,22 @@ func InitGhidraMCPClient(p *GhidraParam, protocolVersion string, clientInfo *mcp
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(ghidraMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/ghidra",
-		Version: "0.1.0",
+
+	if ghidraMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		ghidraMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if ghidraMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		ghidraMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/ghidra",
+			Version: "0.1.0",
+		}
 	}
-	ghidraMCPClient.StdioClientConf.InitReq = initRequest
 
 	return ghidraMCPClient
 }

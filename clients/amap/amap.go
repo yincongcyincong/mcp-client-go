@@ -13,10 +13,7 @@ type AmapParam struct {
 	AmapApiKey string
 }
 
-func InitAmapMCPClient(p *AmapParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
-
+func InitAmapMCPClient(p *AmapParam, options ...param.Option) *param.MCPClientConf {
 	amapMCPClient := &param.MCPClientConf{
 		Name: NpxAmapMapsMcpServer,
 		StdioClientConf: &param.StdioClientConfig{
@@ -30,23 +27,22 @@ func InitAmapMCPClient(p *AmapParam, protocolVersion string, clientInfo *mcp.Imp
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(amapMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/amap-maps",
-		Version: "0.1.0",
+
+	if amapMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		amapMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if amapMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		amapMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/amap-maps",
+			Version: "0.1.0",
+		}
 	}
-	amapMCPClient.StdioClientConf.InitReq = initRequest
 
 	return amapMCPClient
 }

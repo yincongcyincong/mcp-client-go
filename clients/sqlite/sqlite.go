@@ -13,9 +13,7 @@ type SqliteParam struct {
 	SqliteDBPath string
 }
 
-func InitSqliteMCPClient(p *SqliteParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitSqliteMCPClient(p *SqliteParam, options ...param.Option) *param.MCPClientConf {
 
 	sqliteMCPClient := &param.MCPClientConf{
 		Name: NpxSqliteMcpServer,
@@ -29,23 +27,22 @@ func InitSqliteMCPClient(p *SqliteParam, protocolVersion string, clientInfo *mcp
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(sqliteMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/sqlite",
-		Version: "0.1.0",
+
+	if sqliteMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		sqliteMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if sqliteMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		sqliteMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/sqlite",
+			Version: "0.1.0",
+		}
 	}
-	sqliteMCPClient.StdioClientConf.InitReq = initRequest
 
 	return sqliteMCPClient
 }

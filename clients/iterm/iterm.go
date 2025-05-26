@@ -12,9 +12,7 @@ const (
 type ItermParam struct {
 }
 
-func InitItermMCPClient(p *ItermParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitItermMCPClient(p *ItermParam, options ...param.Option) *param.MCPClientConf {
 
 	itermMCPClient := &param.MCPClientConf{
 		Name: NpxItermMcpServer,
@@ -27,23 +25,22 @@ func InitItermMCPClient(p *ItermParam, protocolVersion string, clientInfo *mcp.I
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(itermMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/iterm",
-		Version: "0.1.0",
+
+	if itermMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		itermMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if itermMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		itermMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/iterm",
+			Version: "0.1.0",
+		}
 	}
-	itermMCPClient.StdioClientConf.InitReq = initRequest
 
 	return itermMCPClient
 }

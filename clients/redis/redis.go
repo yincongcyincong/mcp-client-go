@@ -14,9 +14,7 @@ type RedisParam struct {
 	RedisPath string
 }
 
-func InitRedisMCPClient(p *RedisParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitRedisMCPClient(p *RedisParam, options ...param.Option) *param.MCPClientConf {
 
 	redisMCPClient := &param.MCPClientConf{
 		Name: NpxRedisMcpServer,
@@ -30,30 +28,27 @@ func InitRedisMCPClient(p *RedisParam, protocolVersion string, clientInfo *mcp.I
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(redisMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/redis",
-		Version: "0.1.0",
+
+	if redisMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		redisMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if redisMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		redisMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/redis",
+			Version: "0.1.0",
+		}
 	}
-	redisMCPClient.StdioClientConf.InitReq = initRequest
 
 	return redisMCPClient
 }
 
-func InitDockerRedisMCPClient(p *RedisParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerRedisMCPClient(p *RedisParam, options ...param.Option) *param.MCPClientConf {
 
 	redisMCPClient := &param.MCPClientConf{
 		Name: DockerRedisMcpServer,
@@ -68,23 +63,22 @@ func InitDockerRedisMCPClient(p *RedisParam, protocolVersion string, clientInfo 
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(redisMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/redis",
-		Version: "0.1.0",
+
+	if redisMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		redisMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if redisMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		redisMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/redis",
+			Version: "0.1.0",
+		}
 	}
-	redisMCPClient.StdioClientConf.InitReq = initRequest
 
 	return redisMCPClient
 }

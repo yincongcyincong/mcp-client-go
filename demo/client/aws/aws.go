@@ -14,7 +14,7 @@ import (
 func main() {
 	mc := aws.InitAwsDocumentationMCPClient(&aws.AwsDocumentationParams{
 		FastMCPLogLevel: "ERROR",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)

@@ -16,9 +16,7 @@ type FilesystemParam struct {
 	PathPairs map[string]string
 }
 
-func InitFilesystemMCPClient(p *FilesystemParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitFilesystemMCPClient(p *FilesystemParam, options ...param.Option) *param.MCPClientConf {
 
 	filesystemMCPClient := &param.MCPClientConf{
 		Name: NpxFilesystemMcpServer,
@@ -31,32 +29,29 @@ func InitFilesystemMCPClient(p *FilesystemParam, protocolVersion string, clientI
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
 	filesystemMCPClient.StdioClientConf.Args = append(filesystemMCPClient.StdioClientConf.Args, p.Paths...)
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(filesystemMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/filesystem",
-		Version: "0.1.0",
+
+	if filesystemMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		filesystemMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if filesystemMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		filesystemMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/filesystem",
+			Version: "0.1.0",
+		}
 	}
-	filesystemMCPClient.StdioClientConf.InitReq = initRequest
 
 	return filesystemMCPClient
 }
 
-func InitDockerFilesystemMCPClient(p *FilesystemParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerFilesystemMCPClient(p *FilesystemParam, options ...param.Option) *param.MCPClientConf {
 
 	filesystemMCPClient := &param.MCPClientConf{
 		Name: DockerFilesystemServer,
@@ -66,8 +61,6 @@ func InitDockerFilesystemMCPClient(p *FilesystemParam, protocolVersion string, c
 			Args:    []string{},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
 	args := []string{
@@ -82,19 +75,20 @@ func InitDockerFilesystemMCPClient(p *FilesystemParam, protocolVersion string, c
 	args = append(args, "mcp/filesystem", "/projects")
 	filesystemMCPClient.StdioClientConf.Args = args
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(filesystemMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/filesystem",
-		Version: "0.1.0",
+
+	if filesystemMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		filesystemMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if filesystemMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		filesystemMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/filesystem",
+			Version: "0.1.0",
+		}
 	}
-	filesystemMCPClient.StdioClientConf.InitReq = initRequest
 
 	return filesystemMCPClient
 }

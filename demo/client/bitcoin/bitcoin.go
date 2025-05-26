@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	mc := bitcoin.InitBitcoinMCPClient(&bitcoin.BitcoinParam{}, "", nil, nil, nil)
+	mc := bitcoin.InitBitcoinMCPClient(&bitcoin.BitcoinParam{})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)

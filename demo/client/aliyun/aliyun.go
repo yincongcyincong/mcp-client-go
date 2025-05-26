@@ -15,7 +15,7 @@ func main() {
 	mc := aliyun.InitAliyunMCPClient(&aliyun.AliyunParams{
 		AliyunAccessKeyID:     "xxx",
 		AliyunAccessKeySecret: "xxx",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)

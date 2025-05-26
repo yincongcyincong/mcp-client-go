@@ -9,9 +9,10 @@ const (
 	NpxEdgeoneMcpServer = "npx-edgeone-mcp-server"
 )
 
-func InitEdgeoneMCPClient(protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+type EdgeOneParam struct {
+}
+
+func InitEdgeoneMCPClient(p *EdgeOneParam, options ...param.Option) *param.MCPClientConf {
 
 	edgeoneMCPClient := &param.MCPClientConf{
 		Name: NpxEdgeoneMcpServer,
@@ -23,23 +24,22 @@ func InitEdgeoneMCPClient(protocolVersion string, clientInfo *mcp.Implementation
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(edgeoneMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/edgeone",
-		Version: "0.1.0",
+
+	if edgeoneMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		edgeoneMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if edgeoneMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		edgeoneMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/edgeone",
+			Version: "0.1.0",
+		}
 	}
-	edgeoneMCPClient.StdioClientConf.InitReq = initRequest
 
 	return edgeoneMCPClient
 }

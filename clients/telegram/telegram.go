@@ -15,9 +15,7 @@ type TelegramParam struct {
 	TelegramSessionString string
 }
 
-func InitDockerTelegramMCPClient(p *TelegramParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDockerTelegramMCPClient(p *TelegramParam, options ...param.Option) *param.MCPClientConf {
 
 	telegramMCPClient := &param.MCPClientConf{
 		Name: DockerTelegramMcpServer,
@@ -37,23 +35,22 @@ func InitDockerTelegramMCPClient(p *TelegramParam, protocolVersion string, clien
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(telegramMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/telegram",
-		Version: "0.1.0",
+
+	if telegramMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		telegramMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if telegramMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		telegramMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/telegram",
+			Version: "0.1.0",
+		}
 	}
-	telegramMCPClient.StdioClientConf.InitReq = initRequest
 
 	return telegramMCPClient
 }

@@ -14,9 +14,7 @@ type WhaPsAppParam struct {
 	PythonMainFile string
 }
 
-func InitWhatsappMCPClient(p *WhaPsAppParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitWhatsappMCPClient(p *WhaPsAppParam, options ...param.Option) *param.MCPClientConf {
 
 	whatsappMCPClient := &param.MCPClientConf{
 		Name: UvWhatsAppMcpServer,
@@ -31,23 +29,22 @@ func InitWhatsappMCPClient(p *WhaPsAppParam, protocolVersion string, clientInfo 
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(whatsappMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/whatsapp",
-		Version: "0.1.0",
+
+	if whatsappMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		whatsappMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if whatsappMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		whatsappMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/whatsapp",
+			Version: "0.1.0",
+		}
 	}
-	whatsappMCPClient.StdioClientConf.InitReq = initRequest
 
 	return whatsappMCPClient
 }

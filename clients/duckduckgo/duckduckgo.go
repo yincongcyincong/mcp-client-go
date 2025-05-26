@@ -12,9 +12,7 @@ const (
 type DuckduckgoParam struct {
 }
 
-func InitDuckduckgoMCPClient(p *DuckduckgoParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitDuckduckgoMCPClient(p *DuckduckgoParam, options ...param.Option) *param.MCPClientConf {
 
 	duckduckgoMCPClient := &param.MCPClientConf{
 		Name:       NpxDuckduckgoMcpServer,
@@ -27,23 +25,22 @@ func InitDuckduckgoMCPClient(p *DuckduckgoParam, protocolVersion string, clientI
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(duckduckgoMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/duckduckgo",
-		Version: "0.1.0",
+
+	if duckduckgoMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		duckduckgoMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if duckduckgoMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		duckduckgoMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/duckduckgo",
+			Version: "0.1.0",
+		}
 	}
-	duckduckgoMCPClient.StdioClientConf.InitReq = initRequest
 
 	return duckduckgoMCPClient
 }

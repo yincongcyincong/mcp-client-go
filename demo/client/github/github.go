@@ -15,7 +15,7 @@ func main() {
 	// todo modify token
 	mc := github.InitModelContextProtocolGithubMCPClient(&github.GithubParam{
 		GithubAccessToken: "xxx",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)

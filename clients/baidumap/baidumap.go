@@ -13,9 +13,7 @@ type BaidumapParam struct {
 	BaidumapApiKey string
 }
 
-func InitBaidumapMCPClient(p *BaidumapParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitBaidumapMCPClient(p *BaidumapParam, options ...param.Option) *param.MCPClientConf {
 
 	baidumapMCPClient := &param.MCPClientConf{
 		Name: NpxBaidumapMcpServer,
@@ -30,23 +28,22 @@ func InitBaidumapMCPClient(p *BaidumapParam, protocolVersion string, clientInfo 
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(baidumapMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/baidumap",
-		Version: "0.1.0",
+
+	if baidumapMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		baidumapMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if baidumapMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		baidumapMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/baidumap",
+			Version: "0.1.0",
+		}
 	}
-	baidumapMCPClient.StdioClientConf.InitReq = initRequest
 
 	return baidumapMCPClient
 }

@@ -12,9 +12,7 @@ const (
 type BilibiliParam struct {
 }
 
-func InitBilibiliMCPClient(p *BilibiliParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitBilibiliMCPClient(p *BilibiliParam, options ...param.Option) *param.MCPClientConf {
 
 	bilibiliMCPClient := &param.MCPClientConf{
 		Name: NpxBilibiliMcpServer,
@@ -27,23 +25,22 @@ func InitBilibiliMCPClient(p *BilibiliParam, protocolVersion string, clientInfo 
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(bilibiliMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/bilibili",
-		Version: "0.1.0",
+
+	if bilibiliMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		bilibiliMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if bilibiliMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		bilibiliMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/bilibili",
+			Version: "0.1.0",
+		}
 	}
-	bilibiliMCPClient.StdioClientConf.InitReq = initRequest
 
 	return bilibiliMCPClient
 }

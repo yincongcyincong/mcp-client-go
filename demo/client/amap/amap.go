@@ -15,7 +15,7 @@ func main() {
 	// todo modify token
 	mc := amap.InitAmapMCPClient(&amap.AmapParam{
 		AmapApiKey: "xxx",
-	}, "", nil, nil, nil)
+	})
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)

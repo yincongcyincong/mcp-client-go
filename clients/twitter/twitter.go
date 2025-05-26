@@ -16,9 +16,7 @@ type TwitterParam struct {
 	AccessTokenSecret string
 }
 
-func InitTwitterMCPClient(p *TwitterParam, protocolVersion string, clientInfo *mcp.Implementation,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitTwitterMCPClient(p *TwitterParam, options ...param.Option) *param.MCPClientConf {
 
 	twitterMCPClient := &param.MCPClientConf{
 		Name: NpxTwitterMcpServer,
@@ -36,23 +34,22 @@ func InitTwitterMCPClient(p *TwitterParam, protocolVersion string, clientInfo *m
 			},
 			InitReq: mcp.InitializeRequest{},
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	initRequest := mcp.InitializeRequest{}
-	initRequest.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
-	if protocolVersion != "" {
-		initRequest.Params.ProtocolVersion = protocolVersion
+	for _, o := range options {
+		o(twitterMCPClient)
 	}
-	initRequest.Params.ClientInfo = mcp.Implementation{
-		Name:    "mcp-server/twitter",
-		Version: "0.1.0",
+
+	if twitterMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		twitterMCPClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
 	}
-	if clientInfo != nil {
-		initRequest.Params.ClientInfo = *clientInfo
+
+	if twitterMCPClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		twitterMCPClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/twitter",
+			Version: "0.1.0",
+		}
 	}
-	twitterMCPClient.StdioClientConf.InitReq = initRequest
 
 	return twitterMCPClient
 }
