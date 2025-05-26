@@ -156,42 +156,63 @@ func createStdioMCPClient(ctx context.Context, clientParam *param.MCPClientConf)
 	return nil
 }
 
-func InitStdioMCPClient(name, command string, env, args []string, initReq mcp.InitializeRequest,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitStdioMCPClient(name, command string, env, args []string, options ...param.Option) *param.MCPClientConf {
 
-	amapMCPClient := &param.MCPClientConf{
+	mcpClient := &param.MCPClientConf{
 		Name:       name,
 		ClientType: param.StdioType,
 		StdioClientConf: &param.StdioClientConfig{
 			Command: command,
 			Env:     env,
 			Args:    args,
-			InitReq: initReq,
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	return amapMCPClient
+	for _, o := range options {
+		o(mcpClient)
+	}
+
+	if mcpClient.StdioClientConf.InitReq.Params.ProtocolVersion == "" {
+		mcpClient.StdioClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
+	}
+
+	if mcpClient.StdioClientConf.InitReq.Params.ClientInfo.Name == "" {
+		mcpClient.StdioClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/unknown",
+			Version: "0.1.0",
+		}
+	}
+
+	return mcpClient
 }
 
-func InitSSEMCPClient(name, baseUrl string, options []transport.ClientOption,
-	toolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error,
-	toolsAfterFunc map[string]func(req *mcp.CallToolResult) (string, error)) *param.MCPClientConf {
+func InitSSEMCPClient(name, baseUrl string, sseOptions []transport.ClientOption, options ...param.Option) *param.MCPClientConf {
 
-	amapMCPClient := &param.MCPClientConf{
+	mcpClient := &param.MCPClientConf{
 		Name:       name,
 		ClientType: param.SSEType,
 		SSEClientConf: &param.SSEClientConfig{
-			Options: options,
+			Options: sseOptions,
 			BaseUrl: baseUrl,
 		},
-		ToolsBeforeFunc: toolsBeforeFunc,
-		ToolsAfterFunc:  toolsAfterFunc,
 	}
 
-	return amapMCPClient
+	for _, o := range options {
+		o(mcpClient)
+	}
+
+	if mcpClient.SSEClientConf.InitReq.Params.ProtocolVersion == "" {
+		mcpClient.SSEClientConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
+	}
+
+	if mcpClient.SSEClientConf.InitReq.Params.ClientInfo.Name == "" {
+		mcpClient.SSEClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/unknown",
+			Version: "0.1.0",
+		}
+	}
+
+	return mcpClient
 }
 
 func GetMCPClient(name string) (*MCPClient, error) {

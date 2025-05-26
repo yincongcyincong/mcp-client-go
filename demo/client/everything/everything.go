@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/yincongcyincong/mcp-client-go/clients"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"log"
@@ -24,7 +23,7 @@ func StdioClient() {
 	}, []string{
 		"-y",
 		"@amap/amap-maps-mcp-server",
-	}, mcp.InitializeRequest{}, nil, nil)
+	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
@@ -60,7 +59,7 @@ func StdioClient() {
 
 func SSEClient() {
 	// execute npx @playwright/mcp@latest --port 8931
-	mc := clients.InitSSEMCPClient("playwright", "http://localhost:8931/sse", nil, nil, nil)
+	mc := clients.InitSSEMCPClient("playwright", "http://localhost:8931/sse", nil)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
