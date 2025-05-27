@@ -15,7 +15,7 @@
 
 ## 📋 支持的服务
 
-| MCP 服务            | 	描述                                                                                                                                                                                                  | 文档                                                                                          | 示例                                                                                                                |                                                                                            
+| MCP 服务            | 	描述                                                                                                                                                                                                  | 文档                                                                                          | 示例                                                                                                                |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | redis	              | 提供Redis数据库访问的MCP服务                                                                                                                                                                          | [文档](https://github.com/modelcontextprotocol/servers/tree/main/src/redis)                   | [redis示例](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/redis/redis.go)                  |
 | github	             | 提供GitHub API集成的MCP服务                                                                                                                                                                           | [文档](https://github.com/github/github-mcp-server)                                           | [github示例](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/github/github.go)               |
@@ -56,9 +56,9 @@ go get github.com/yincongcyincong/mcp-client-go
 
 ## 🧪 示例代码
 
-[客户端示例](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/client)    
-[应用示例](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)     
-[DeepSeek集成示例](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/deepseek/deepseek.go)       
+[客户端示例](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/client)
+[应用示例](https://github.com/yincongcyincong/mcp-client-go/tree/main/demo/app)
+[DeepSeek集成示例](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/deepseek/deepseek.go)
 [OpenAI集成示例](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/openai/openai.go)
 
 ---
@@ -70,14 +70,13 @@ go get github.com/yincongcyincong/mcp-client-go
 ```go
 // 标准IO模式初始化
 conf := clients.InitStdioMCPClient("npx-amap-maps-mcp-server", "npx", []string{
-    "AMAP_MAPS_API_KEY=" + AmapApiKey,
-}, []string{
-    "-y",
-    "@amap/amap-maps-mcp-server",
-}, mcp.InitializeRequest{}, nil, nil)
-
-// SSE模式初始化
-conf := clients.InitSSEMCPClient("npx-amap-maps-mcp-server", "http://127.0.0.1", nil, nil, nil)
+		"AMAP_MAPS_API_KEY=" + AmapApiKey,
+		}, []string{
+		"-y",
+		"@amap/amap-maps-mcp-server",
+		})
+// 标准SSE初始化
+conf := clients.InitSSEMCPClient("npx-amap-maps-mcp-server", "http://127.0.0.1", nil)
 ```
 
 ### 注册MCP客户端

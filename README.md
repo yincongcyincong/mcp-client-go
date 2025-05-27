@@ -103,7 +103,7 @@ conf := clients.InitStdioMCPClient("npx-amap-maps-mcp-server", "npx", []string{
 "@amap/amap-maps-mcp-server",
 })
 /
-conf := clients.InitSSEMCPClient("npx-amap-maps-mcp-server", "http://127.0.0.1", nil, nil, nil)
+conf := clients.InitSSEMCPClient("npx-amap-maps-mcp-server", "http://127.0.0.1", nil)
 ```
 
 ### Register MCP Clients
