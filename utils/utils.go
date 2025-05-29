@@ -2,11 +2,13 @@ package utils
 
 import (
 	"encoding/json"
+	"strings"
+
 	"github.com/cohesion-org/deepseek-go"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/sashabaranov/go-openai"
 	"github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
-	"strings"
+	"google.golang.org/genai"
 )
 
 func ReturnString(result *mcp.CallToolResult) string {
@@ -45,9 +47,9 @@ func TransToolsToDPFunctionCall(tools []mcp.Tool) []deepseek.Tool {
 }
 
 func TransToolsToChatGPTFunctionCall(tools []mcp.Tool) []openai.Tool {
-	deepseekTools := make([]openai.Tool, 0)
+	openaiTools := make([]openai.Tool, 0)
 	for _, tool := range tools {
-		deepseekTool := openai.Tool{
+		openaiTool := openai.Tool{
 			Type: "function",
 			Function: &openai.FunctionDefinition{
 				Name:        tool.Name,
@@ -59,10 +61,43 @@ func TransToolsToChatGPTFunctionCall(tools []mcp.Tool) []openai.Tool {
 				},
 			},
 		}
-		deepseekTools = append(deepseekTools, deepseekTool)
+		openaiTools = append(openaiTools, openaiTool)
 	}
 
-	return deepseekTools
+	return openaiTools
+}
+
+func TransToolsToGeminiFunctionCall(tools []mcp.Tool) []*genai.Tool {
+	geminiTools := []*genai.Tool{}
+
+	for _, tool := range tools {
+		prop := make(map[string]*genai.Schema)
+		propByte, err := json.Marshal(tool.InputSchema.Properties)
+		if err != nil {
+			continue
+		}
+		err = json.Unmarshal(propByte, &prop)
+		if err != nil {
+			continue
+		}
+		geminiTool := &genai.Tool{
+			FunctionDeclarations: []*genai.FunctionDeclaration{
+				{
+					Name:        tool.Name,
+					Description: tool.Description,
+					Parameters: &genai.Schema{
+						Type:       genai.TypeObject,
+						Properties: prop,
+						Required:   tool.InputSchema.Required,
+					},
+				},
+			},
+		}
+
+		geminiTools = append(geminiTools, geminiTool)
+	}
+
+	return geminiTools
 }
 
 func TransToolsToVolFunctionCall(tools []mcp.Tool) []*model.Tool {
