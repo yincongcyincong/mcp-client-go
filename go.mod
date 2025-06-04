@@ -4,7 +4,7 @@ go 1.23.7
 
 require (
 	github.com/cohesion-org/deepseek-go v1.2.10
-	github.com/mark3labs/mcp-go v0.25.0
+	github.com/mark3labs/mcp-go v0.31.0
 	github.com/sashabaranov/go-openai v1.38.1
 	github.com/volcengine/volcengine-go-sdk v1.1.1
 	google.golang.org/genai v1.7.0

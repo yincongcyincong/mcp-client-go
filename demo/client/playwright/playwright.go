@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/yincongcyincong/mcp-client-go/clients"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"github.com/yincongcyincong/mcp-client-go/clients/playwright"
-	"log"
-	"time"
 )
 
 func main() {

@@ -7,6 +7,7 @@ import (
 	"log"
 	"runtime/debug"
 	"sync"
+	"time"
 
 	"github.com/mark3labs/mcp-go/client"
 	"github.com/mark3labs/mcp-go/client/transport"
@@ -73,7 +74,7 @@ func createSSEMCPClient(ctx context.Context, clientParam *param.MCPClientConf) e
 		return err
 	}
 
-	err = c.Start(ctx)
+	err = c.Start(context.Background())
 	if err != nil {
 		return err
 	}
@@ -95,6 +96,8 @@ func createSSEMCPClient(ctx context.Context, clientParam *param.MCPClientConf) e
 	mc.Tools = tools
 
 	mcpClients.Store(clientParam.Name, mc)
+
+	go mc.handlePing()
 	return nil
 }
 
@@ -153,6 +156,8 @@ func createStdioMCPClient(ctx context.Context, clientParam *param.MCPClientConf)
 	mc.Tools = tools
 
 	mcpClients.Store(clientParam.Name, mc)
+
+	go mc.handlePing()
 	return nil
 }
 
@@ -312,4 +317,55 @@ func (m *MCPClient) ExecTools(ctx context.Context, name string, params map[strin
 	}
 
 	return utils.ReturnString(result), nil
+}
+
+func (m *MCPClient) handlePing() {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("panic recovered: %v\n%s", r, debug.Stack())
+		}
+	}()
+
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
+		var err error
+		if m.Conf.SSEClientConf == nil || m.Conf.ClientType != param.SSEType {
+			err = m.StdioClient.Ping(ctx)
+		} else {
+			err = m.SSEClient.Ping(ctx)
+		}
+
+		if err != nil {
+			log.Println("mcp ping fail:", err)
+
+			// reconnect
+			if m.Conf.SSEClientConf == nil || m.Conf.ClientType != param.SSEType {
+				err = m.StdioClient.Close()
+				if err != nil {
+					log.Println("close fail:", err)
+				}
+				err = createStdioMCPClient(ctx, m.Conf)
+				if err != nil {
+					log.Println("create new mcp client fail:", err)
+					continue
+				}
+			} else {
+				err = m.SSEClient.Close()
+				if err != nil {
+					log.Println("close fail:", err)
+				}
+				err = createSSEMCPClient(ctx, m.Conf)
+				if err != nil {
+					log.Println("create new mcp client fail:", err)
+					continue
+				}
+			}
+			break
+		}
+	}
+
 }
