@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/yincongcyincong/mcp-client-go/clients"
 	"github.com/yincongcyincong/mcp-client-go/clients/amap"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
-	"log"
-	"time"
 )
 
 func main() {
@@ -53,4 +54,33 @@ func main() {
 
 	fmt.Println(data)
 
+}
+
+func heartbeat() {
+	mc := amap.InitAmapMCPClient(&amap.AmapParam{
+		AmapApiKey: "xxx",
+	})
+
+	// Create context with timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
+	defer cancel()
+
+	errs := clients.RegisterMCPClient(ctx, []*param.MCPClientConf{mc})
+	if len(errs) > 0 {
+		log.Fatal("InitMCPClient failed:", errs)
+	}
+
+	for {
+		c, err := clients.GetMCPClient(amap.NpxAmapMapsMcpServer)
+		if err != nil {
+			log.Fatal("GetMCPClient failed:", err)
+		}
+
+		err = c.StdioClient.Ping(context.Background())
+		if err != nil {
+			fmt.Println("ping fail:", err)
+		}
+
+		time.Sleep(5 * time.Second)
+	}
 }
