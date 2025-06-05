@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/mark3labs/mcp-go/client"
-	"github.com/mark3labs/mcp-go/client/transport"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"github.com/yincongcyincong/mcp-client-go/utils"
@@ -133,7 +132,7 @@ func createHTTPStreamCPClient(ctx context.Context, clientParam *param.MCPClientC
 		return err
 	}
 
-	initResult, err := c.Initialize(ctx, clientParam.SSEClientConf.InitReq)
+	initResult, err := c.Initialize(ctx, clientParam.HTTPStreamerConf.InitReq)
 	if err != nil {
 		return err
 	}
@@ -245,13 +244,12 @@ func InitStdioMCPClient(name, command string, env, args []string, options ...par
 	return mcpClient
 }
 
-func InitSSEMCPClient(name, baseUrl string, sseOptions []transport.ClientOption, options ...param.Option) *param.MCPClientConf {
+func InitSSEMCPClient(name, baseUrl string, options ...param.Option) *param.MCPClientConf {
 
 	mcpClient := &param.MCPClientConf{
 		Name:       name,
 		ClientType: param.SSEType,
 		SSEClientConf: &param.SSEClientConfig{
-			Options: sseOptions,
 			BaseUrl: baseUrl,
 		},
 	}
@@ -266,6 +264,33 @@ func InitSSEMCPClient(name, baseUrl string, sseOptions []transport.ClientOption,
 
 	if mcpClient.SSEClientConf.InitReq.Params.ClientInfo.Name == "" {
 		mcpClient.SSEClientConf.InitReq.Params.ClientInfo = mcp.Implementation{
+			Name:    "mcp-server/unknown",
+			Version: "0.1.0",
+		}
+	}
+
+	return mcpClient
+}
+
+func InitHttpMCPClient(name, baseUrl string, options ...param.Option) *param.MCPClientConf {
+	mcpClient := &param.MCPClientConf{
+		Name:       name,
+		ClientType: param.HTTPStreamer,
+		HTTPStreamerConf: &param.HTTPStreamerConfig{
+			BaseURL: baseUrl,
+		},
+	}
+
+	for _, o := range options {
+		o(mcpClient)
+	}
+
+	if mcpClient.HTTPStreamerConf.InitReq.Params.ProtocolVersion == "" {
+		mcpClient.HTTPStreamerConf.InitReq.Params.ProtocolVersion = mcp.LATEST_PROTOCOL_VERSION
+	}
+
+	if mcpClient.HTTPStreamerConf.InitReq.Params.ClientInfo.Name == "" {
+		mcpClient.HTTPStreamerConf.InitReq.Params.ClientInfo = mcp.Implementation{
 			Name:    "mcp-server/unknown",
 			Version: "0.1.0",
 		}

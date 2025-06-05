@@ -78,3 +78,21 @@ func WithToolsAfterFunc(toolsAfterFunc map[string]func(req *mcp.CallToolResult) 
 		p.ToolsAfterFunc = toolsAfterFunc
 	}
 }
+
+func WithHttpOptions(httpOptions []transport.StreamableHTTPCOption) Option {
+	return func(p *MCPClientConf) {
+		p.HTTPStreamerConf.Options = httpOptions
+	}
+}
+
+func WithHttpOauth(oauth *client.OAuthConfig) Option {
+	return func(p *MCPClientConf) {
+		p.HTTPStreamerConf.Oauth = oauth
+	}
+}
+
+func WithSSEOptions(sseOptions []transport.ClientOption) Option {
+	return func(p *MCPClientConf) {
+		p.SSEClientConf.Options = sseOptions
+	}
+}
