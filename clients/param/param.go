@@ -1,20 +1,23 @@
 package param
 
 import (
+	"github.com/mark3labs/mcp-go/client"
 	"github.com/mark3labs/mcp-go/client/transport"
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
 const (
-	SSEType   = "sse"
-	StdioType = "stdio"
+	SSEType      = "sse"
+	StdioType    = "stdio"
+	HTTPStreamer = "http-streamer"
 )
 
 type MCPClientConf struct {
-	Name            string
-	ClientType      string
-	SSEClientConf   *SSEClientConfig
-	StdioClientConf *StdioClientConfig
+	Name             string
+	ClientType       string
+	SSEClientConf    *SSEClientConfig
+	StdioClientConf  *StdioClientConfig
+	HTTPStreamerConf *HTTPStreamerConfig
 
 	ToolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error
 	ToolsAfterFunc  map[string]func(req *mcp.CallToolResult) (string, error)
@@ -31,6 +34,13 @@ type SSEClientConfig struct {
 	Options []transport.ClientOption
 	BaseUrl string
 	InitReq mcp.InitializeRequest
+}
+
+type HTTPStreamerConfig struct {
+	BaseURL string
+	Options []transport.StreamableHTTPCOption
+	InitReq mcp.InitializeRequest
+	Oauth   *client.OAuthConfig
 }
 
 type Option func(p *MCPClientConf)

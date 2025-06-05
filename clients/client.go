@@ -21,11 +21,10 @@ var (
 )
 
 type MCPClient struct {
-	Conf        *param.MCPClientConf
-	StdioClient *client.Client
-	SSEClient   *client.Client
-	InitReq     *mcp.InitializeResult
-	Tools       []mcp.Tool
+	Conf    *param.MCPClientConf
+	Client  *client.Client
+	InitReq *mcp.InitializeResult
+	Tools   []mcp.Tool
 }
 
 func RegisterMCPClient(ctx context.Context, params []*param.MCPClientConf) map[string]error {
@@ -43,20 +42,28 @@ func RegisterMCPClient(ctx context.Context, params []*param.MCPClientConf) map[s
 				}
 				wg.Done()
 			}()
-			if cp.SSEClientConf == nil || cp.ClientType != param.SSEType {
-				err := createStdioMCPClient(ctx, cp)
-				if err != nil {
-					mutex.Lock()
-					errs[clientParam.Name] = err
-					mutex.Unlock()
-				}
-			} else {
+			if cp.SSEClientConf != nil && cp.ClientType == param.SSEType {
 				err := createSSEMCPClient(ctx, cp)
 				if err != nil {
 					mutex.Lock()
 					errs[clientParam.Name] = err
 					mutex.Unlock()
 				}
+			} else if cp.HTTPStreamerConf != nil && cp.ClientType == param.HTTPStreamer {
+				err := createHTTPStreamCPClient(ctx, cp)
+				if err != nil {
+					mutex.Lock()
+					errs[clientParam.Name] = err
+					mutex.Unlock()
+				}
+			} else {
+				err := createStdioMCPClient(ctx, cp)
+				if err != nil {
+					mutex.Lock()
+					errs[clientParam.Name] = err
+					mutex.Unlock()
+				}
+
 			}
 		}(clientParam)
 	}
@@ -85,9 +92,56 @@ func createSSEMCPClient(ctx context.Context, clientParam *param.MCPClientConf) e
 	}
 
 	mc := &MCPClient{
-		Conf:      clientParam,
-		SSEClient: c,
-		InitReq:   initResult,
+		Conf:    clientParam,
+		Client:  c,
+		InitReq: initResult,
+	}
+	tools, err := mc.GetAllTools(ctx, "")
+	if err != nil {
+		return err
+	}
+	mc.Tools = tools
+
+	mcpClients.Store(clientParam.Name, mc)
+
+	go mc.handlePing()
+	return nil
+}
+
+func createHTTPStreamCPClient(ctx context.Context, clientParam *param.MCPClientConf) error {
+	var c *client.Client
+	var err error
+	if clientParam.HTTPStreamerConf.Oauth != nil {
+		c, err = client.NewOAuthStreamableHttpClient(
+			clientParam.HTTPStreamerConf.BaseURL,
+			*clientParam.HTTPStreamerConf.Oauth,
+			clientParam.HTTPStreamerConf.Options...,
+		)
+	} else {
+		c, err = client.NewStreamableHttpClient(
+			clientParam.HTTPStreamerConf.BaseURL,
+			clientParam.HTTPStreamerConf.Options...,
+		)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	err = c.Start(context.Background())
+	if err != nil {
+		return err
+	}
+
+	initResult, err := c.Initialize(ctx, clientParam.SSEClientConf.InitReq)
+	if err != nil {
+		return err
+	}
+
+	mc := &MCPClient{
+		Conf:    clientParam,
+		Client:  c,
+		InitReq: initResult,
 	}
 	tools, err := mc.GetAllTools(ctx, "")
 	if err != nil {
@@ -145,9 +199,9 @@ func createStdioMCPClient(ctx context.Context, clientParam *param.MCPClientConf)
 	}
 
 	mc := &MCPClient{
-		Conf:        clientParam,
-		StdioClient: c,
-		InitReq:     initResult,
+		Conf:    clientParam,
+		Client:  c,
+		InitReq: initResult,
 	}
 	tools, err := mc.GetAllTools(ctx, "")
 	if err != nil {
@@ -254,11 +308,7 @@ func (m *MCPClient) GetAllTools(ctx context.Context, cursor mcp.Cursor) ([]mcp.T
 
 	var tools *mcp.ListToolsResult
 	var err error
-	if m.Conf.SSEClientConf == nil || m.Conf.ClientType != param.SSEType {
-		tools, err = m.StdioClient.ListTools(ctx, toolsRequest)
-	} else {
-		tools, err = m.SSEClient.ListTools(ctx, toolsRequest)
-	}
+	tools, err = m.Client.ListTools(ctx, toolsRequest)
 
 	if err != nil {
 		return nil, err
@@ -302,12 +352,7 @@ func (m *MCPClient) ExecTools(ctx context.Context, name string, params map[strin
 	}
 	var result *mcp.CallToolResult
 	var err error
-
-	if m.Conf.SSEClientConf == nil || m.Conf.ClientType != param.SSEType {
-		result, err = m.StdioClient.CallTool(ctx, reqTool)
-	} else {
-		result, err = m.SSEClient.CallTool(ctx, reqTool)
-	}
+	result, err = m.Client.CallTool(ctx, reqTool)
 	if err != nil {
 		return "", err
 	}
@@ -330,42 +375,42 @@ func (m *MCPClient) handlePing() {
 	defer ticker.Stop()
 
 	for range ticker.C {
-		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-
-		var err error
-		if m.Conf.SSEClientConf == nil || m.Conf.ClientType != param.SSEType {
-			err = m.StdioClient.Ping(ctx)
-		} else {
-			err = m.SSEClient.Ping(ctx)
-		}
-
-		if err != nil {
-			log.Println("mcp ping fail:", err)
-
-			// reconnect
-			if m.Conf.SSEClientConf == nil || m.Conf.ClientType != param.SSEType {
-				err = m.StdioClient.Close()
-				if err != nil {
-					log.Println("close fail:", err)
-				}
-				err = createStdioMCPClient(ctx, m.Conf)
-				if err != nil {
-					log.Println("create new mcp client fail:", err)
-					continue
-				}
-			} else {
-				err = m.SSEClient.Close()
-				if err != nil {
-					log.Println("close fail:", err)
-				}
-				err = createSSEMCPClient(ctx, m.Conf)
-				if err != nil {
-					log.Println("create new mcp client fail:", err)
-					continue
-				}
-			}
+		if m.restartMCPServer() {
 			break
 		}
 	}
 
+}
+
+func (m *MCPClient) restartMCPServer() bool {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err := m.Client.Ping(ctx)
+
+	if err != nil {
+		log.Println("mcp ping fail:", err)
+
+		// reconnect
+		err = m.Client.Close()
+		if err != nil {
+			log.Println("close fail:", err)
+		}
+
+		if m.Conf.SSEClientConf != nil && m.Conf.ClientType == param.SSEType {
+			err = createSSEMCPClient(ctx, m.Conf)
+		} else if m.Conf.HTTPStreamerConf != nil && m.Conf.ClientType == param.HTTPStreamer {
+			err = createHTTPStreamCPClient(ctx, m.Conf)
+		} else {
+			err = createStdioMCPClient(ctx, m.Conf)
+		}
+
+		if err != nil {
+			log.Println("create new mcp client fail:", err)
+			return false
+		}
+
+		return true
+	}
+
+	return false
 }
