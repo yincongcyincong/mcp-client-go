@@ -5,6 +5,7 @@ go 1.23.7
 require (
 	github.com/cohesion-org/deepseek-go v1.2.10
 	github.com/mark3labs/mcp-go v0.31.0
+	github.com/revrost/go-openrouter v0.1.6
 	github.com/sashabaranov/go-openai v1.38.1
 	github.com/volcengine/volcengine-go-sdk v1.1.1
 	google.golang.org/genai v1.7.0
@@ -21,6 +22,9 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/rs/zerolog v1.34.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	go.opencensus.io v0.24.0 // indirect

@@ -6,6 +6,7 @@ import (
 
 	"github.com/cohesion-org/deepseek-go"
 	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/revrost/go-openrouter"
 	"github.com/sashabaranov/go-openai"
 	"github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
 	"google.golang.org/genai"
@@ -26,9 +27,9 @@ func ReturnString(result *mcp.CallToolResult) string {
 }
 
 func TransToolsToDPFunctionCall(tools []mcp.Tool) []deepseek.Tool {
-	deepseekTools := make([]deepseek.Tool, 0)
+	openRouterTools := make([]deepseek.Tool, 0)
 	for _, tool := range tools {
-		deepseekTool := deepseek.Tool{
+		openRouterTool := deepseek.Tool{
 			Type: "function",
 			Function: deepseek.Function{
 				Name:        tool.Name,
@@ -40,10 +41,10 @@ func TransToolsToDPFunctionCall(tools []mcp.Tool) []deepseek.Tool {
 				},
 			},
 		}
-		deepseekTools = append(deepseekTools, deepseekTool)
+		openRouterTools = append(openRouterTools, openRouterTool)
 	}
 
-	return deepseekTools
+	return openRouterTools
 }
 
 func TransToolsToChatGPTFunctionCall(tools []mcp.Tool) []openai.Tool {
@@ -100,6 +101,26 @@ func TransToolsToGeminiFunctionCall(tools []mcp.Tool) []*genai.Tool {
 	return geminiTools
 }
 
+func TransToolsToOpenRouterFunctionCall(tools []mcp.Tool) []openrouter.Tool {
+	deepseekTools := make([]openrouter.Tool, 0)
+	for _, tool := range tools {
+		deepseekTool := openrouter.Tool{
+			Type: "function",
+			Function: &openrouter.FunctionDefinition{
+				Name:        tool.Name,
+				Description: tool.Description,
+				Parameters: map[string]interface{}{
+					"type":       "object",
+					"properties": tool.InputSchema.Properties,
+					"required":   tool.InputSchema.Required,
+				},
+			},
+		}
+		deepseekTools = append(deepseekTools, deepseekTool)
+	}
+
+	return deepseekTools
+}
 func TransToolsToVolFunctionCall(tools []mcp.Tool) []*model.Tool {
 	deepseekTools := make([]*model.Tool, 0)
 	for _, tool := range tools {
