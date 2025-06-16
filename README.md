@@ -11,7 +11,8 @@ and interact with various MCP-based services such as Amap (Gaode Maps) using a u
 - Modular support for service types (e.g., Amap, Github, GoogleMap)
 - Unified registration and client management
 - Simple and intuitive tool execution interface
-- Provide prompt to trigger mcp request [doc](https://github.com/yincongcyincong/mcp-client-go/blob/main/prompt/README.md)
+- Provide prompt to trigger mcp
+  request [doc](https://github.com/yincongcyincong/mcp-client-go/blob/main/prompt/README.md)
 
 ---
 
@@ -68,6 +69,8 @@ and interact with various MCP-based services such as Amap (Gaode Maps) using a u
 | mysql	               | MCP Server for Mysql's API.                                                                                                                                                                                   | [doc](https://github.com/benborla/mcp-server-mysql)                                     |                                                                                                                              |
 | google calendar	     | MCP Server for Google Calendar's API.                                                                                                                                                                         | [doc](https://github.com/takumi0706/google-calendar-mcp)                                |                                                                                                                              |
 | sqlite	              | MCP Server for Sqlite's API.                                                                                                                                                                                  | [doc](https://github.com/jparkerweb/mcp-sqlite)                                         |                                                                                                                              |
+| mongo	               | MCP Server for Mongo's API.                                                                                                                                                                                   | [doc](https://github.com/kiliczsh/mcp-mongo-server)                                     |                                                                                                                              |
+| opgg	                | MCP Server for Opgg's API.                                                                                                                                                                                    | [doc](https://github.com/opgginc/opgg-mcp)                                              | [opgg](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/opgg/opgg.go)                                  |
 
 ## 🚀 Getting Started
 
