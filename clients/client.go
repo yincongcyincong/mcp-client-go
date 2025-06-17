@@ -2,14 +2,18 @@ package clients
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"runtime/debug"
 	"sync"
 	"time"
 
 	"github.com/mark3labs/mcp-go/client"
+	"github.com/mark3labs/mcp-go/client/transport"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"github.com/yincongcyincong/mcp-client-go/utils"
@@ -24,6 +28,52 @@ type MCPClient struct {
 	Client  *client.Client
 	InitReq *mcp.InitializeResult
 	Tools   []mcp.Tool
+}
+
+func InitByConfFile(ctx context.Context, configFilePath string) ([]*param.MCPClientConf, error) {
+	data, err := os.ReadFile(configFilePath)
+	if err != nil {
+		return nil, err
+	}
+
+	config := new(param.McpClientGoConfig)
+	err = json.Unmarshal(data, config)
+	if err != nil {
+		return nil, err
+	}
+
+	mcs := make([]*param.MCPClientConf, 0)
+	for mcpName, mcpConf := range config.McpServers {
+		mcpType := getMcpType(mcpConf)
+		switch mcpType {
+		case param.StdioType:
+			mcs = append(mcs, InitStdioMCPClient(mcpName, mcpConf.Command,
+				utils.ChangeEnvMapToSlice(mcpConf.Env), mcpConf.Args))
+		case param.HTTPConfigType:
+			httpType, err := utils.CheckSSEAndHTTP(mcpConf.Url)
+			if err != nil {
+				return nil, err
+			}
+
+			if httpType == param.SSEType {
+				mcs = append(mcs, InitSSEMCPClient(mcpName, mcpConf.Url,
+					param.WithSSEOptions([]transport.ClientOption{
+						transport.WithHeaders(mcpConf.Headers),
+					})))
+			} else {
+				mcs = append(mcs, InitHttpMCPClient(mcpName, mcpConf.Url,
+					param.WithHttpOptions([]transport.StreamableHTTPCOption{
+						transport.WithHTTPHeaders(mcpConf.Headers),
+					})))
+			}
+
+		default:
+			return nil, errors.New("mcp type not exist!")
+		}
+	}
+
+	return mcs, nil
+
 }
 
 func RegisterMCPClient(ctx context.Context, params []*param.MCPClientConf) map[string]error {
@@ -438,4 +488,16 @@ func (m *MCPClient) restartMCPServer() bool {
 	}
 
 	return false
+}
+
+func getMcpType(conf *param.MCPConfig) string {
+	if conf.Type != "" {
+		return conf.Type
+	}
+
+	if conf.Command != "" {
+		return param.StdioConfigType
+	}
+
+	return param.HTTPConfigType
 }

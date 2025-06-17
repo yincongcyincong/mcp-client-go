@@ -2,17 +2,24 @@ package utils
 
 import (
 	"encoding/json"
+	"net/http"
 	"strings"
+	"time"
 
 	"github.com/cohesion-org/deepseek-go"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/revrost/go-openrouter"
 	"github.com/sashabaranov/go-openai"
 	"github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
+	"github.com/yincongcyincong/mcp-client-go/clients/param"
 	"google.golang.org/genai"
 )
 
 func ReturnString(result *mcp.CallToolResult) string {
+	if result == nil {
+		return ""
+	}
+
 	var res strings.Builder
 	for _, content := range result.Content {
 		if textContent, ok := content.(mcp.TextContent); ok {
@@ -140,4 +147,31 @@ func TransToolsToVolFunctionCall(tools []mcp.Tool) []*model.Tool {
 	}
 
 	return deepseekTools
+}
+
+func ChangeEnvMapToSlice(env map[string]string) []string {
+	res := make([]string, 0)
+	for k, v := range env {
+		res = append(res, k+"="+v)
+	}
+	return res
+}
+
+func CheckSSEAndHTTP(url string) (string, error) {
+	client := &http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	resp, err := client.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	contentType := resp.Header.Get("Content-Type")
+	if contentType == "text/event-stream" {
+		return param.SSEType, nil
+	}
+
+	return param.HTTPStreamer, nil
 }

@@ -17,7 +17,7 @@ func main() {
 
 	SSEClient()
 
-	httpStream()
+	HttpStream()
 
 }
 
@@ -93,7 +93,7 @@ func SSEClient() {
 	fmt.Println(data)
 }
 
-func httpStream() {
+func HttpStream() {
 	// todo modify token
 	// execute `uvx amap-mcp-server streamable-http`
 	mc := clients.InitHttpMCPClient(amap.UvxAmapMcpServer, "http://127.0.0.1:8000/mcp")

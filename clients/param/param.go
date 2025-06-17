@@ -10,7 +10,25 @@ const (
 	SSEType      = "sse"
 	StdioType    = "stdio"
 	HTTPStreamer = "http-streamer"
+
+	HTTPConfigType  = "http"
+	StdioConfigType = "stdio"
 )
+
+type McpClientGoConfig struct {
+	McpServers map[string]*MCPConfig `json:"mcpServers"`
+}
+
+type MCPConfig struct {
+	Command string            `json:"command"`
+	Args    []string          `json:"args"`
+	Env     map[string]string `json:"env"`
+
+	Url     string            `json:"url"`
+	Headers map[string]string `json:"headers"`
+
+	Type string `json:"type"`
+}
 
 type MCPClientConf struct {
 	Name             string

@@ -1,0 +1,24 @@
+{
+	"mcpServers": {
+		"github": {
+			"command": "docker",
+			"args": [
+				"run",
+				"-i",
+				"--rm",
+				"-e",
+				"GITHUB_PERSONAL_ACCESS_TOKEN",
+				"ghcr.io/github/github-mcp-server"
+			],
+			"env": {
+				"GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
+			}
+		},
+		"playwright": {
+			"url": "http://localhost:8931/sse"
+		},
+		"amap-mcp-server": {
+			"url": "http://localhost:8000/mcp"
+		}
+	}
+}
