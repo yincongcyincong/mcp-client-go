@@ -17,7 +17,7 @@ func main() {
 	defer cancel()
 
 	mcs, err := clients.InitByConfFile(ctx,
-		"/Users/yincong/go/src/github.com/yincongcyincong/mcp-client-go/demo/client/mcpconf/test.json")
+		"./test.json")
 	if err != nil {
 		log.Fatal("get conf fail:", err)
 	}
