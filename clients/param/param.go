@@ -27,11 +27,13 @@ type MCPConfig struct {
 	Url     string            `json:"url"`
 	Headers map[string]string `json:"headers"`
 
-	Type string `json:"type"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
 }
 
 type MCPClientConf struct {
 	Name             string
+	Description      string
 	ClientType       string
 	SSEClientConf    *SSEClientConfig
 	StdioClientConf  *StdioClientConfig
@@ -112,5 +114,11 @@ func WithHttpOauth(oauth *client.OAuthConfig) Option {
 func WithSSEOptions(sseOptions []transport.ClientOption) Option {
 	return func(p *MCPClientConf) {
 		p.SSEClientConf.Options = sseOptions
+	}
+}
+
+func WithDescription(description string) Option {
+	return func(p *MCPClientConf) {
+		p.Description = description
 	}
 }

@@ -3,7 +3,6 @@ package clients
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -30,7 +29,7 @@ type MCPClient struct {
 	Tools   []mcp.Tool
 }
 
-func InitByConfFile(ctx context.Context, configFilePath string) ([]*param.MCPClientConf, error) {
+func InitByConfFile(configFilePath string) ([]*param.MCPClientConf, error) {
 	data, err := os.ReadFile(configFilePath)
 	if err != nil {
 		return nil, err
@@ -48,27 +47,31 @@ func InitByConfFile(ctx context.Context, configFilePath string) ([]*param.MCPCli
 		switch mcpType {
 		case param.StdioType:
 			mcs = append(mcs, InitStdioMCPClient(mcpName, mcpConf.Command,
-				utils.ChangeEnvMapToSlice(mcpConf.Env), mcpConf.Args))
+				utils.ChangeEnvMapToSlice(mcpConf.Env), mcpConf.Args,
+				param.WithDescription(mcpConf.Description)))
 		case param.HTTPConfigType:
-			httpType, err := utils.CheckSSEAndHTTP(mcpConf.Url)
+			httpType, err := utils.CheckSSEOrHTTP(mcpConf.Url)
 			if err != nil {
-				return nil, err
+				log.Println("CheckSSEOrHTTP fail, err:", err)
+				continue
 			}
 
 			if httpType == param.SSEType {
 				mcs = append(mcs, InitSSEMCPClient(mcpName, mcpConf.Url,
 					param.WithSSEOptions([]transport.ClientOption{
 						transport.WithHeaders(mcpConf.Headers),
-					})))
+					}),
+					param.WithDescription(mcpConf.Description)))
 			} else {
 				mcs = append(mcs, InitHttpMCPClient(mcpName, mcpConf.Url,
 					param.WithHttpOptions([]transport.StreamableHTTPCOption{
 						transport.WithHTTPHeaders(mcpConf.Headers),
-					})))
+					}),
+					param.WithDescription(mcpConf.Description)))
 			}
 
 		default:
-			return nil, errors.New("mcp type not exist!")
+			log.Println("mcp type not exist, mcpType:", mcpType)
 		}
 	}
 

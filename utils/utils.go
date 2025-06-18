@@ -157,7 +157,7 @@ func ChangeEnvMapToSlice(env map[string]string) []string {
 	return res
 }
 
-func CheckSSEAndHTTP(url string) (string, error) {
+func CheckSSEOrHTTP(url string) (string, error) {
 	client := &http.Client{
 		Timeout: 5 * time.Second,
 	}

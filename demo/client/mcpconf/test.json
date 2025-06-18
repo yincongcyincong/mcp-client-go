@@ -2,6 +2,7 @@
 	"mcpServers": {
 		"github": {
 			"command": "docker",
+			"description": "Performs Git operations and integrates with GitHub to manage repositories, pull requests, issues, and workflows.",
 			"args": [
 				"run",
 				"-i",
@@ -15,9 +16,11 @@
 			}
 		},
 		"playwright": {
+			"description": "Simulates browser behavior for tasks like web navigation, data scraping, and automated interactions with web pages.",
 			"url": "http://localhost:8931/sse"
 		},
 		"amap-mcp-server": {
+			"description": "Provides geographic services such as location lookup, route planning, and map navigation.",
 			"url": "http://localhost:8000/mcp"
 		}
 	}

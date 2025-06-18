@@ -16,8 +16,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	mcs, err := clients.InitByConfFile(ctx,
-		"./test.json")
+	mcs, err := clients.InitByConfFile("./test.json")
 	if err != nil {
 		log.Fatal("get conf fail:", err)
 	}
