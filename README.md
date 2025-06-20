@@ -11,7 +11,7 @@ and interact with various MCP-based services such as Amap (Gaode Maps) using a u
 - Modular support for service types (e.g., Amap, Github, GoogleMap)
 - Unified registration and client management
 - Simple and intuitive tool execution interface
-- Support config file to set mcp server [demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/mcpconf)
+- Support **claude like config file** to set mcp server [demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/mcpconf)
 - Provide prompt to trigger mcp
   request [doc](https://github.com/yincongcyincong/mcp-client-go/blob/main/prompt/README.md)
 
