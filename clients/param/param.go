@@ -10,7 +10,7 @@ const (
 	SSEType      = "sse"
 	StdioType    = "stdio"
 	HTTPStreamer = "http-streamer"
-
+	
 	HTTPConfigType  = "http"
 	StdioConfigType = "stdio"
 )
@@ -23,12 +23,23 @@ type MCPConfig struct {
 	Command string            `json:"command"`
 	Args    []string          `json:"args"`
 	Env     map[string]string `json:"env"`
-
+	
 	Url     string            `json:"url"`
 	Headers map[string]string `json:"headers"`
-
+	
 	Type        string `json:"type"`
 	Description string `json:"description"`
+	
+	OAuth *OAuthConfig `json:"oauth"`
+}
+
+type OAuthConfig struct {
+	ClientID              string   `json:"client_id"`
+	ClientSecret          string   `json:"client_secret"`
+	Scopes                []string `json:"scopes"`
+	AuthServerMetadataURL string   `json:"auth_server_metadata_url"`
+	RedirectURL           string   `json:"redirect_url"`
+	PKCEEnabled           bool     `json:"pkce_enabled"`
 }
 
 type MCPClientConf struct {
@@ -38,7 +49,7 @@ type MCPClientConf struct {
 	SSEClientConf    *SSEClientConfig
 	StdioClientConf  *StdioClientConfig
 	HTTPStreamerConf *HTTPStreamerConfig
-
+	
 	ToolsBeforeFunc map[string]func(req *mcp.CallToolRequest) error
 	ToolsAfterFunc  map[string]func(req *mcp.CallToolResult) (string, error)
 }
@@ -84,6 +95,9 @@ func WithClientInfo(clientInfo mcp.Implementation) Option {
 		if p.SSEClientConf != nil {
 			p.SSEClientConf.InitReq.Params.ClientInfo = clientInfo
 		}
+		if p.HTTPStreamerConf != nil {
+			p.HTTPStreamerConf.InitReq.Params.ClientInfo = clientInfo
+		}
 	}
 }
 
@@ -99,19 +113,35 @@ func WithToolsAfterFunc(toolsAfterFunc map[string]func(req *mcp.CallToolResult) 
 	}
 }
 
-func WithHttpOptions(httpOptions []transport.StreamableHTTPCOption) Option {
+func WithHttpOptions(httpOptions ...transport.StreamableHTTPCOption) Option {
 	return func(p *MCPClientConf) {
 		p.HTTPStreamerConf.Options = httpOptions
 	}
 }
 
-func WithHttpOauth(oauth *client.OAuthConfig) Option {
+func WithHttpOauth(oauth *OAuthConfig) Option {
 	return func(p *MCPClientConf) {
-		p.HTTPStreamerConf.Oauth = oauth
+		if oauth == nil {
+			return
+		}
+		
+		oauthConfig := &transport.OAuthConfig{
+			ClientID:              oauth.ClientID,
+			ClientSecret:          oauth.ClientSecret,
+			RedirectURI:           oauth.RedirectURL,
+			Scopes:                oauth.Scopes,
+			TokenStore:            client.NewMemoryTokenStore(),
+			AuthServerMetadataURL: oauth.AuthServerMetadataURL,
+			PKCEEnabled:           oauth.PKCEEnabled,
+		}
+		
+		if p.HTTPStreamerConf != nil {
+			p.HTTPStreamerConf.Oauth = oauthConfig
+		}
 	}
 }
 
-func WithSSEOptions(sseOptions []transport.ClientOption) Option {
+func WithSSEOptions(sseOptions ...transport.ClientOption) Option {
 	return func(p *MCPClientConf) {
 		p.SSEClientConf.Options = sseOptions
 	}

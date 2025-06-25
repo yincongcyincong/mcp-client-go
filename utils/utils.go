@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
+	
 	"github.com/cohesion-org/deepseek-go"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/revrost/go-openrouter"
@@ -19,7 +19,7 @@ func ReturnString(result *mcp.CallToolResult) string {
 	if result == nil {
 		return ""
 	}
-
+	
 	var res strings.Builder
 	for _, content := range result.Content {
 		if textContent, ok := content.(mcp.TextContent); ok {
@@ -29,7 +29,7 @@ func ReturnString(result *mcp.CallToolResult) string {
 			res.Write(jsonBytes)
 		}
 	}
-
+	
 	return res.String()
 }
 
@@ -50,7 +50,7 @@ func TransToolsToDPFunctionCall(tools []mcp.Tool) []deepseek.Tool {
 		}
 		openRouterTools = append(openRouterTools, openRouterTool)
 	}
-
+	
 	return openRouterTools
 }
 
@@ -71,13 +71,13 @@ func TransToolsToChatGPTFunctionCall(tools []mcp.Tool) []openai.Tool {
 		}
 		openaiTools = append(openaiTools, openaiTool)
 	}
-
+	
 	return openaiTools
 }
 
 func TransToolsToGeminiFunctionCall(tools []mcp.Tool) []*genai.Tool {
 	geminiTools := []*genai.Tool{}
-
+	
 	for _, tool := range tools {
 		prop := make(map[string]*genai.Schema)
 		propByte, err := json.Marshal(tool.InputSchema.Properties)
@@ -101,10 +101,10 @@ func TransToolsToGeminiFunctionCall(tools []mcp.Tool) []*genai.Tool {
 				},
 			},
 		}
-
+		
 		geminiTools = append(geminiTools, geminiTool)
 	}
-
+	
 	return geminiTools
 }
 
@@ -125,7 +125,7 @@ func TransToolsToOpenRouterFunctionCall(tools []mcp.Tool) []openrouter.Tool {
 		}
 		deepseekTools = append(deepseekTools, deepseekTool)
 	}
-
+	
 	return deepseekTools
 }
 func TransToolsToVolFunctionCall(tools []mcp.Tool) []*model.Tool {
@@ -145,7 +145,7 @@ func TransToolsToVolFunctionCall(tools []mcp.Tool) []*model.Tool {
 		}
 		deepseekTools = append(deepseekTools, deepseekTool)
 	}
-
+	
 	return deepseekTools
 }
 
@@ -161,17 +161,17 @@ func CheckSSEOrHTTP(url string) (string, error) {
 	client := &http.Client{
 		Timeout: 5 * time.Second,
 	}
-
+	
 	resp, err := client.Get(url)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
-
+	
 	contentType := resp.Header.Get("Content-Type")
 	if contentType == "text/event-stream" {
 		return param.SSEType, nil
 	}
-
+	
 	return param.HTTPStreamer, nil
 }
