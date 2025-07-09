@@ -20,26 +20,26 @@ type McpClientGoConfig struct {
 }
 
 type MCPConfig struct {
-	Command string            `json:"command"`
-	Args    []string          `json:"args"`
-	Env     map[string]string `json:"env"`
+	Command string            `json:"command,omitempty"`
+	Args    []string          `json:"args,omitempty"`
+	Env     map[string]string `json:"env,omitempty"`
 	
-	Url     string            `json:"url"`
-	Headers map[string]string `json:"headers"`
+	Url     string            `json:"url,omitempty"`
+	Headers map[string]string `json:"headers,omitempty"`
 	
-	Type        string `json:"type"`
-	Description string `json:"description"`
+	Type        string `json:"type,omitempty"`
+	Description string `json:"description,omitempty"`
 	
-	OAuth *OAuthConfig `json:"oauth"`
+	OAuth *OAuthConfig `json:"oauth,omitempty"`
 }
 
 type OAuthConfig struct {
-	ClientID              string   `json:"client_id"`
-	ClientSecret          string   `json:"client_secret"`
-	Scopes                []string `json:"scopes"`
-	AuthServerMetadataURL string   `json:"auth_server_metadata_url"`
-	RedirectURL           string   `json:"redirect_url"`
-	PKCEEnabled           bool     `json:"pkce_enabled"`
+	ClientID              string   `json:"client_id,omitEmpty"`
+	ClientSecret          string   `json:"client_secret,omitempty"`
+	Scopes                []string `json:"scopes,omitempty"`
+	AuthServerMetadataURL string   `json:"auth_server_metadata_url,omitempty"`
+	RedirectURL           string   `json:"redirect_url,omitempty"`
+	PKCEEnabled           bool     `json:"pkce_enabled,omitempty"`
 }
 
 type MCPClientConf struct {
