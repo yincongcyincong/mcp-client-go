@@ -27,6 +27,9 @@ type MCPClient struct {
 	Client  *client.Client
 	InitReq *mcp.InitializeResult
 	Tools   []mcp.Tool
+	
+	ctx    context.Context
+	cancel context.CancelFunc
 }
 
 // InitByConfFile Initialize multiple MCP clients from configuration files
@@ -143,21 +146,7 @@ func createSSEMCPClient(ctx context.Context, clientParam *param.MCPClientConf) e
 		return err
 	}
 	
-	mc := &MCPClient{
-		Conf:    clientParam,
-		Client:  c,
-		InitReq: initResult,
-	}
-	tools, err := mc.GetAllTools(ctx, "")
-	if err != nil {
-		return err
-	}
-	mc.Tools = tools
-	
-	mcpClients.Store(clientParam.Name, mc)
-	
-	go mc.handlePing()
-	return nil
+	return initMCPClient(ctx, c, clientParam, initResult)
 }
 
 // createSSEMCPClient create SSE MCP client
@@ -191,21 +180,7 @@ func createHTTPStreamCPClient(ctx context.Context, clientParam *param.MCPClientC
 		return err
 	}
 	
-	mc := &MCPClient{
-		Conf:    clientParam,
-		Client:  c,
-		InitReq: initResult,
-	}
-	tools, err := mc.GetAllTools(ctx, "")
-	if err != nil {
-		return err
-	}
-	mc.Tools = tools
-	
-	mcpClients.Store(clientParam.Name, mc)
-	
-	go mc.handlePing()
-	return nil
+	return initMCPClient(ctx, c, clientParam, initResult)
 }
 
 // createStdioMCPClient create stdio MCP client
@@ -252,16 +227,30 @@ func createStdioMCPClient(ctx context.Context, clientParam *param.MCPClientConf)
 		return err
 	}
 	
+	return initMCPClient(ctx, c, clientParam, initResult)
+}
+
+func initMCPClient(ctx context.Context, c *client.Client,
+	clientParam *param.MCPClientConf, initResult *mcp.InitializeResult) error {
+	
+	mcContext, cancel := context.WithCancel(context.Background())
 	mc := &MCPClient{
 		Conf:    clientParam,
 		Client:  c,
 		InitReq: initResult,
+		
+		ctx:    mcContext,
+		cancel: cancel,
 	}
 	tools, err := mc.GetAllTools(ctx, "")
 	if err != nil {
 		return err
 	}
 	mc.Tools = tools
+	
+	if clientInter, ok := mcpClients.Load(clientParam.Name); ok {
+		clientInter.(*MCPClient).Close()
+	}
 	
 	mcpClients.Store(clientParam.Name, mc)
 	
@@ -462,9 +451,13 @@ func (m *MCPClient) handlePing() {
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 	
-	for range ticker.C {
-		if m.restartMCPServer() {
-			break
+	for {
+		select {
+		case <-ticker.C:
+			m.restartMCPServer()
+		case <-m.ctx.Done():
+			log.Println("mcp client stoped", m.Conf.Name)
+			return
 		}
 	}
 	
@@ -478,12 +471,6 @@ func (m *MCPClient) restartMCPServer() bool {
 	
 	if err != nil {
 		log.Println("mcp ping fail:", err)
-		
-		// reconnect
-		err = m.Client.Close()
-		if err != nil {
-			log.Println("close fail:", err)
-		}
 		
 		if m.Conf.SSEClientConf != nil && m.Conf.ClientType == param.SSEType {
 			err = createSSEMCPClient(ctx, m.Conf)
@@ -502,6 +489,11 @@ func (m *MCPClient) restartMCPServer() bool {
 	}
 	
 	return false
+}
+
+func (m *MCPClient) Close() {
+	m.cancel()
+	m.Client.Close()
 }
 
 // getMcpType get mcp type
