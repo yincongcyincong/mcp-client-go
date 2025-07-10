@@ -47,37 +47,50 @@ func InitByConfFile(configFilePath string) ([]*param.MCPClientConf, error) {
 	
 	mcs := make([]*param.MCPClientConf, 0)
 	for mcpName, mcpConf := range config.McpServers {
-		mcpType := getMcpType(mcpConf)
-		switch mcpType {
-		case param.StdioType:
-			mcs = append(mcs, InitStdioMCPClient(mcpName, mcpConf.Command,
-				utils.ChangeEnvMapToSlice(mcpConf.Env), mcpConf.Args,
-				param.WithDescription(mcpConf.Description)))
-		case param.HTTPConfigType:
-			httpType, err := utils.CheckSSEOrHTTP(mcpConf.Url)
-			if err != nil {
-				log.Println("CheckSSEOrHTTP fail, err:", err)
-				continue
-			}
-			
-			if httpType == param.SSEType {
-				mcs = append(mcs, InitSSEMCPClient(mcpName, mcpConf.Url,
-					param.WithSSEOptions(transport.WithHeaders(mcpConf.Headers)),
-					param.WithDescription(mcpConf.Description)))
-			} else {
-				mcs = append(mcs, InitHttpMCPClient(mcpName, mcpConf.Url,
-					param.WithHttpOptions(transport.WithHTTPHeaders(mcpConf.Headers)),
-					param.WithDescription(mcpConf.Description),
-					param.WithHttpOauth(mcpConf.OAuth)))
-			}
-		
-		default:
-			log.Println("mcp type not exist, mcpType:", mcpType)
+		mcpClientConf := GetOneMCPClient(mcpName, mcpConf)
+		if mcpClientConf != nil {
+			mcs = append(mcs, mcpClientConf)
 		}
 	}
 	
 	return mcs, nil
 	
+}
+
+func GetOneMCPClient(mcpName string, mcpConf *param.MCPConfig) *param.MCPClientConf {
+	if mcpConf.Disabled {
+		return nil
+	}
+	
+	mcpType := getMcpType(mcpConf)
+	switch mcpType {
+	case param.StdioType:
+		return InitStdioMCPClient(mcpName, mcpConf.Command,
+			utils.ChangeEnvMapToSlice(mcpConf.Env), mcpConf.Args,
+			param.WithDescription(mcpConf.Description))
+	case param.HTTPConfigType:
+		httpType, err := utils.CheckSSEOrHTTP(mcpConf.Url)
+		if err != nil {
+			log.Println("CheckSSEOrHTTP fail, err:", err)
+			return nil
+		}
+		
+		if httpType == param.SSEType {
+			return InitSSEMCPClient(mcpName, mcpConf.Url,
+				param.WithSSEOptions(transport.WithHeaders(mcpConf.Headers)),
+				param.WithDescription(mcpConf.Description))
+		} else {
+			return InitHttpMCPClient(mcpName, mcpConf.Url,
+				param.WithHttpOptions(transport.WithHTTPHeaders(mcpConf.Headers)),
+				param.WithDescription(mcpConf.Description),
+				param.WithHttpOauth(mcpConf.OAuth))
+		}
+	
+	default:
+		log.Println("mcp type not exist, mcpType:", mcpType)
+	}
+	
+	return nil
 }
 
 // RegisterMCPClient register multiple MCP clients
@@ -494,6 +507,24 @@ func (m *MCPClient) restartMCPServer() bool {
 func (m *MCPClient) Close() {
 	m.cancel()
 	m.Client.Close()
+}
+
+func RemoveMCPClient(name string) error {
+	c, err := GetMCPClient(name)
+	if err != nil {
+		return err
+	}
+	c.Close()
+	mcpClients.Delete(name)
+	return nil
+}
+
+func ClearAllMCPClient() {
+	mcpClients.Range(func(key, value interface{}) bool {
+		value.(*MCPClient).Close()
+		return true
+	})
+	mcpClients.Clear()
 }
 
 // getMcpType get mcp type

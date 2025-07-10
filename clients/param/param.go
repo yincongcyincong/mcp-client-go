@@ -30,6 +30,8 @@ type MCPConfig struct {
 	Type        string `json:"type,omitempty"`
 	Description string `json:"description,omitempty"`
 	
+	Disabled bool `json:"disabled,omitempty"`
+	
 	OAuth *OAuthConfig `json:"oauth,omitempty"`
 }
 
