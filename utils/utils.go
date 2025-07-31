@@ -69,6 +69,11 @@ func TransToolsToChatGPTFunctionCall(tools []mcp.Tool) []openai.Tool {
 				},
 			},
 		}
+		
+		if len(tool.InputSchema.Properties) == 0 {
+			openaiTool.Function.Parameters = nil
+		}
+		
 		openaiTools = append(openaiTools, openaiTool)
 	}
 	
