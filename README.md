@@ -126,10 +126,25 @@ conf := clients.InitStdioMCPClient("npx-amap-maps-mcp-server", "npx", []string{
 "@amap/amap-maps-mcp-server",
 })
 /
+guardedConf := clients.InitStdioMCPClient("guarded-filesystem", "armorer-guard", []string{}, []string{
+"mcp-proxy",
+"--",
+"npx",
+"-y",
+"@modelcontextprotocol/server-filesystem",
+"/tmp",
+})
+/
 conf := clients.InitSSEMCPClient("npx-amap-maps-mcp-server", "http://127.0.0.1")
 /
 conf := clients.InitHttpMCPClient("npx-amap-maps-mcp-server", "http://127.0.0.1")
 ```
+
+The `guarded-filesystem` example uses
+[Armorer Guard](https://github.com/ArmorerLabs/Armorer-Guard) as a local stdio
+proxy. It inspects MCP tool-call arguments for prompt injection, credential
+leakage, exfiltration risk, and dangerous actions before forwarding safe calls
+to the underlying server.
 
 ### Register MCP Clients
 
