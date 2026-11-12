@@ -42,6 +42,7 @@ and interact with various MCP-based services such as Amap (Gaode Maps) using a u
 | blender	             | BlenderMCP connects Blender to Claude AI through the Model Context Protocol (MCP)                                                                                                                             | [doc](https://github.com/ahujasid/blender-mcp)                                          | -                                                                                                                            |
 | framelink	           | Give Cursor, Windsurf, Cline, and other AI-powered coding tools access to your Figma files with this Model Context Protocol server.                                                                           | [doc](https://github.com/GLips/Figma-Context-MCP)                                       | -                                                                                                                            |
 | playwright	          | A Model Context Protocol (MCP) server that provides browser automation capabilities using Playwright.                                                                                                         | [doc](https://github.com/microsoft/playwright-mcp)                                      | [playwright](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/playwright/playwright.go)   sse          |
+| parallel | Free, keyless web search and page extraction over Streamable HTTP. | [doc](https://docs.parallel.ai/integrations/mcp/search-mcp) | [parallel](demo/client/parallel/parallel.go) |
 | tavily	              | The Model Context Protocol (MCP) is an open standard that enables AI systems to interact seamlessly with various data sources and tools, facilitating secure, two-way connections.                            | [doc](https://github.com/tavily-ai/tavily-mcp)                                          | [tavily](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/tavily/tavily.go)                            |
 | time	                | A Model Context Protocol server that provides time and timezone conversion capabilities.                                                                                                                      | [doc](https://github.com/modelcontextprotocol/servers/tree/main/src/time)               | [time](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/time/time.go)   uvx                            |
 | victoriametrics	     | A Model Context Protocol server that provide access to victoria metrics databases.                                                                                                                            | [doc](https://github.com/yincongcyincong/VictoriaMetrics-mcp-server)                    | [victoriametrics](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/victoriametrics/victoriametrics.go) |
@@ -92,6 +93,24 @@ go get github.com/yincongcyincong/mcp-client-go
 [deepseek demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/deepseek/deepseek.go)
 [openai demo](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/app/openai/openai.go)
 [project](https://github.com/yincongcyincong/telegram-deepseek-bot/blob/main/conf/tools_conf.go)
+
+---
+
+### Parallel Search MCP
+
+With Go 1.23.7 or later installed, run from this checkout:
+
+```bash
+go mod download
+go run ./demo/client/parallel
+```
+
+The demo registers `parallel.InitParallelMCPClient()` using the existing client
+API, then calls `web_search` and `web_fetch` and prints their results. It connects
+to `https://search.parallel.ai/mcp` over Streamable HTTP without an API key,
+`npx`, `uvx`, Docker, or an LLM. The free endpoint is rate limited and intended
+for exploration and light use. See the [Search MCP documentation](https://docs.parallel.ai/integrations/mcp/search-mcp)
+for limits and tool parameters. Registration is explicit; other clients are unaffected.
 
 ---
 
