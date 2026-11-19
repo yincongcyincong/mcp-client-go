@@ -43,6 +43,7 @@ and interact with various MCP-based services such as Amap (Gaode Maps) using a u
 | framelink	           | Give Cursor, Windsurf, Cline, and other AI-powered coding tools access to your Figma files with this Model Context Protocol server.                                                                           | [doc](https://github.com/GLips/Figma-Context-MCP)                                       | -                                                                                                                            |
 | playwright	          | A Model Context Protocol (MCP) server that provides browser automation capabilities using Playwright.                                                                                                         | [doc](https://github.com/microsoft/playwright-mcp)                                      | [playwright](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/playwright/playwright.go)   sse          |
 | parallel | Free, keyless web search and page extraction over Streamable HTTP. | [doc](https://docs.parallel.ai/integrations/mcp/search-mcp) | [parallel](demo/client/parallel/parallel.go) |
+| keenable | Web search and page fetch over Streamable HTTP. Works without an API key; a key lifts the hourly limit. | [doc](https://docs.keenable.ai/mcp-server) | [keenable](demo/client/keenable/keenable.go) |
 | tavily	              | The Model Context Protocol (MCP) is an open standard that enables AI systems to interact seamlessly with various data sources and tools, facilitating secure, two-way connections.                            | [doc](https://github.com/tavily-ai/tavily-mcp)                                          | [tavily](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/tavily/tavily.go)                            |
 | time	                | A Model Context Protocol server that provides time and timezone conversion capabilities.                                                                                                                      | [doc](https://github.com/modelcontextprotocol/servers/tree/main/src/time)               | [time](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/time/time.go)   uvx                            |
 | victoriametrics	     | A Model Context Protocol server that provide access to victoria metrics databases.                                                                                                                            | [doc](https://github.com/yincongcyincong/VictoriaMetrics-mcp-server)                    | [victoriametrics](https://github.com/yincongcyincong/mcp-client-go/blob/main/demo/client/victoriametrics/victoriametrics.go) |
@@ -111,6 +112,24 @@ to `https://search.parallel.ai/mcp` over Streamable HTTP without an API key,
 `npx`, `uvx`, Docker, or an LLM. The free endpoint is rate limited and intended
 for exploration and light use. See the [Search MCP documentation](https://docs.parallel.ai/integrations/mcp/search-mcp)
 for limits and tool parameters. Registration is explicit; other clients are unaffected.
+
+### Keenable MCP
+
+With Go installed, run from this checkout:
+
+```bash
+go mod download
+go run ./demo/client/keenable
+```
+
+The demo registers `keenable.InitKeenableMCPClient(...)`, then calls
+`search_web_pages` and `fetch_page_content` and prints the results. Without a key it
+connects to `https://api.keenable.ai/mcp-public`, which allows 1,000 requests per
+hour per IP; keyless requests are logged with the query and IP. Set
+`KEENABLE_API_KEY` to use `https://api.keenable.ai/mcp` with an `X-API-Key` header
+instead. See the [MCP server docs](https://docs.keenable.ai/mcp-server) and
+[rate limits](https://docs.keenable.ai/rate-limits). Registration is explicit; other
+clients are unaffected.
 
 ---
 
